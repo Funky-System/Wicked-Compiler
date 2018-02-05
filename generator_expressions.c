@@ -5,6 +5,11 @@
 #define tag_startswith(ast, tagstr) (str_startswith(ast->tag, tagstr))
 
 void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
+    if (strcmp(ast->contents, "this") == 0) {
+        append_output(state,"ld.arg %d\n", state->function_num_params - 1);
+        return;
+    }
+
     struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
 
     if (state->is_lvalue) {
@@ -14,12 +19,14 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
             append_output(state,"st.addr global_%d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_PARAM) {
-            append_output(state,"st.local %d\n", entry->index);
+            append_output(state,"st.arg %d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is a function, not an lvalue\n", state->filename,
                     ast->state.row + 1,
                     ast->state.col + 1, ast->contents);
             exit(EXIT_FAILURE);
+        } else if (entry->type == SYMBOL_TYPE_FIELD) {
+            append_output(state,"ld.arg %d\nst.mapitem \"%s\"\n", state->function_num_params - 1,entry->name);
         }
     } else {
         // load
@@ -28,9 +35,13 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
             append_output(state,"ld.deref global_%d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_PARAM) {
-            append_output(state,"ld.local %d\n", entry->index);
+            append_output(state,"ld.arg %d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
             append_output(state,"ld.ref %s\n", entry->name);
+        } else if (entry->type == SYMBOL_TYPE_CLASS) {
+            append_output(state,"ld.ref %s\n", entry->name);
+        } else if (entry->type == SYMBOL_TYPE_FIELD) {
+            append_output(state,"ld.arg %d\nld.mapitem \"%s\"\n", state->function_num_params - 1,entry->name);
         }
     }
 }
@@ -64,6 +75,8 @@ void generate_prec20(generator_state_t *state, mpc_ast_t *ast) {
 
     if (strcmp("ident|>", ast->children[0]->tag) == 0) {
         generate_ident(state, ast->children[0]);
+    } if (strcmp("ident|>", ast->tag) == 0) {
+        generate_ident(state, ast);
     } else if (strcmp("factor|>", ast->children[0]->tag) == 0) {
         generate_factor(state, ast->children[0]);
     }
@@ -107,7 +120,39 @@ void generate_prec19fun(generator_state_t *state, mpc_ast_t *ast) {
         i++;
     }
 
-    generate_ident(state, ast->children[0]); // puts function address on the stack
+    generate_ident(state, ast->children[0]->children[0]); // puts function address on the stack
+
+    append_output(state,"call.pop %d\n", num_arguments);
+    append_output(state,"ld.reg %%rr\n");
+}
+
+void generate_prec19memfun(generator_state_t *state, mpc_ast_t *ast) {
+//    assert(0 == strcmp("prec19fun|>", ast->tag));
+
+    append_output(state, "st.reg %%r0\n");
+
+    int i = 1;
+    while (strcmp(ast->children[i]->contents, "(") != 0) i++;
+
+    i++;
+    int num_arguments = 0;
+    while (strcmp(ast->children[i]->contents, ")") != 0) {
+        if (strcmp(ast->children[i]->contents, ",") == 0) {
+            i++;
+            continue;
+        }
+
+        assert(strcmp(ast->children[i]->tag, "exp|>") == 0);
+        generate_exp(state, ast->children[i]);
+        num_arguments++;
+
+        i++;
+    }
+
+    num_arguments++;
+    append_output(state, "ld.reg %%r0\ndup\n");
+    append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
+
     append_output(state,"call.pop %d\n", num_arguments);
     append_output(state,"ld.reg %%rr\n");
 }
@@ -116,15 +161,41 @@ void generate_prec19mem(generator_state_t *state, mpc_ast_t *ast) {
     mpc_ast_t *parent = ast->children[0];
     mpc_ast_t *child = ast->children[2];
 
+    // I assume the parent is a map
+
+    generate_prec20(state, parent);
+    if (tag_startswith(child, "prec19fun")) {
+        generate_prec19memfun(state, child);
+    } else if (tag_startswith(child, "prec19arr")) {
+        assert(0);
+    } else if (tag_startswith(child, "prec19mem")) {
+        generate_prec19mem(state, child);
+    } else if (tag_startswith(child, "ident")) {
+        if (state->is_lvalue) {
+            append_output(state, "st.mapitem \"%s\"\n", child->children[0]->contents);
+        } else {
+            append_output(state, "ld.mapitem \"%s\"\n", child->children[0]->contents);
+        }
+    } else {
+        assert(0);
+    }
+
+
     // TODO
 }
 
 void generate_prec19(generator_state_t *state, mpc_ast_t *ast) {
 //    assert(0 == strcmp("prec19|>", ast->tag));
 
+    state->is_latest_prec19 = 0;
+
     if (tag_startswith(ast->children[0], "prec19arr")) {
+        // for now, always latest, but TODO for future
+        state->is_latest_prec19 = 1;
         generate_prec19arr(state, ast->children[0]);
     } else if (tag_startswith(ast->children[0], "prec19fun")) {
+        // for now, always latest, but TODO for future
+        state->is_latest_prec19 = 1;
         generate_prec19fun(state, ast->children[0]);
     } else if (tag_startswith(ast->children[0], "prec19mem")) {
         generate_prec19mem(state, ast->children[0]);

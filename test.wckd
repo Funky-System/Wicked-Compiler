@@ -1,16 +1,21 @@
+class bla
 
-var a # bla
-if 1 == 2 then
-    a = 4
-end
+    var i = 9
 
-function bla()
-    for i in [0..3] do
-        a = 4
+    function hoi(inc)
+        var i = 123
+        this.i += inc
+        return this.i
     end
 
-    var a = "blabla"
-
-
-    return 1
 end
+
+function basic()
+
+end
+
+var greet = bla()
+greet.hoi(1) ; greet.hoi(1) ; greet.hoi(1)
+var s = greet.hoi(-3)
+
+asm ""

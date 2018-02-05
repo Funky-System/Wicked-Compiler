@@ -21,17 +21,22 @@ typedef struct {
     int uniqueid;
     int is_lvalue;
     int has_lvalue;
+    int is_method;
+    int function_num_params;
+    int is_latest_prec19;
 } generator_state_t;
 
 enum symbol_type {
     SYMBOL_TYPE_LOCAL,
     SYMBOL_TYPE_GLOBAL,
     SYMBOL_TYPE_PARAM,
-    SYMBOL_TYPE_FUNCTION
+    SYMBOL_TYPE_FUNCTION,
+    SYMBOL_TYPE_CLASS,
+    SYMBOL_TYPE_FIELD
 };
 
 struct symbol_table_entry {
-    char *name;
+    const char *name;
     int index;
     enum symbol_type type;
 };
@@ -45,8 +50,8 @@ void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_expstmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_factor(generator_state_t *state, mpc_ast_t *ast);
-void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_function(generator_state_t *state, mpc_ast_t *ast);
+void generate_class(generator_state_t *state, mpc_ast_t *ast);
 void generate_block(generator_state_t *state, mpc_ast_t *ast);
 void generate_decl(generator_state_t *state, mpc_ast_t *ast);
 void generate_if(generator_state_t *state, mpc_ast_t *ast);

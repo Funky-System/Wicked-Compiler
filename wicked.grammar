@@ -30,7 +30,7 @@ prec20    : <factor> | <ident> ;
 prec19arrindex : '[' (<exp> (':' <exp>)?)? ']' ;
 prec19arr : <prec20> <prec19arrindex>+ ;
 prec19fun : <ident> '(' <exp>? (',' <exp>)* ')' ;
-prec19mem : <prec20> "." <prec19> ;
+prec19mem : <prec20> "." (<prec19fun> | <prec19arr> | <prec19mem> | <ident>) ;
 prec19    : <prec19arr>
           | <prec19fun>
           | <prec19mem>
@@ -58,7 +58,7 @@ exp       : <prec01> ;
 prec20stmt    : <factor> ;
 prec19arrstmt : (<prec20stmt> | <ident> ) <prec19arrindex>+ ;
 prec19funstmt : <ident> '(' <exp>? (',' <exp>)* ')' ;
-prec19memstmt : <prec20stmt> "." <prec19> ;
+prec19memstmt : (<prec20stmt> | <ident>) "." (<prec19fun> | <prec19arr> | <prec19mem> | <ident>) ;
 prec19stmt    : <prec19arrstmt>
               | <prec19funstmt>
               | <prec19memstmt>
@@ -112,6 +112,10 @@ stmt      : "do" <doBlock> ("while" <exp> <eos>)?
 args       : <ident>? (',' <ident>)* ;
 function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eos> ;
 
+classVar   : "var" <decl> ( ',' <decl> )* <eos> ;
+classDecl  : ( <function> | <classVar> ) ;
+class      : "class" <ident> <eos> (<classDecl> | <eos>)* "end" <eos> ;
+
 import     : "import" <ident> ("as" (<ident> | "*") )? <eos> ;
 imports    : (<import> | <comment> | <eos>)* ;
 
@@ -119,4 +123,4 @@ exportItem : <ident> ("as" (<ident>) )? ;
 export     : "export" <exportItem> (',' <exportItem>)* <eos> ;
 exports    : (<export> | <comment> | <eos>)* ;
 
-wicked     : /^/ <imports> <exports> (<function> | <stmt> | <eos>)* /$/;
+wicked     : /^/ <imports> <exports> (<function> | <class> | <stmt> | <eos>)* /$/;

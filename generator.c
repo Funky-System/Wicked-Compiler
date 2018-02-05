@@ -49,8 +49,11 @@ int generate(const char *filename, const char *filename_output, mpc_ast_t *ast) 
         mpc_ast_t *part = ast->children[i];
 
         if (strcmp("function|>", part->tag) == 0) generate_function(&state, part);
+        if (strcmp("class|>", part->tag) == 0) generate_class(&state, part);
         if (strcmp("stmt|>", part->tag) == 0) generate_stmt(&state, part);
     }
+
+    //append_output(&state, "ld.uint 0\nst.reg %%rr\n");
 
     hashmap_destroy(&state.symbol_table);
 
