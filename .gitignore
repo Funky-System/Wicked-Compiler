@@ -1,0 +1,5 @@
+# User-specific stuff:
+
+**/.idea/
+cmake-build-debug/
+cmake-build-release/
