@@ -45,7 +45,7 @@ int compile(const char *filename, const char *output_filename) {
 
     if (filename != NULL) {
         mpc_result_t r;
-        if (mpc_parse_contents(filename, parser_sourcecode, &r)) {
+        if (mpc_parse_contents(filename, parser_wicked, &r)) {
             mpc_unfold(r.output);
             //mpc_ast_print(r.output);
             generate(filename, output_filename, (mpc_ast_t*)r.output);
@@ -58,9 +58,52 @@ int compile(const char *filename, const char *output_filename) {
         }
     } else {
         mpc_result_t r;
-        if (mpc_parse_pipe("<stdin>", stdin, parser_sourcecode, &r)) {
+        if (mpc_parse_pipe("<stdin>", stdin, parser_wicked, &r)) {
             mpc_ast_print(r.output);
             generate("<stdin>", output_filename, (mpc_ast_t*)r.output);
+            mpc_ast_delete(r.output);
+        } else {
+            mpc_err_print(r.error);
+            mpc_err_delete(r.error);
+            cleanup_parser_grammar();
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int compiler_print_parse_tree(const char *filename, int folded) {
+    mpc_err_t *err = generate_parser_grammar();
+
+    if (err != NULL) {
+        mpc_err_print(err);
+        mpc_err_delete(err);
+        exit(1);
+        return 0;
+    }
+
+    if (filename != NULL) {
+        mpc_result_t r;
+        if (mpc_parse_contents(filename, parser_wicked, &r)) {
+            if (!folded) {
+                mpc_unfold(r.output);
+            }
+            mpc_ast_print(r.output);
+            mpc_ast_delete(r.output);
+        } else {
+            mpc_err_print(r.error);
+            mpc_err_delete(r.error);
+            cleanup_parser_grammar();
+            return 0;
+        }
+    } else {
+        mpc_result_t r;
+        if (mpc_parse_pipe("<stdin>", stdin, parser_wicked, &r)) {
+            if (!folded) {
+                mpc_unfold(r.output);
+            }
+            mpc_ast_print(r.output);
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);

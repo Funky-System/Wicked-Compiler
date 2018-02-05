@@ -1,5 +1,0 @@
-
-var a # bla
-if 1 == 2 then
-    a = 4
-end

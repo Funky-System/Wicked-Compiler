@@ -119,4 +119,4 @@ exportItem : <ident> ("as" (<ident>) )? ;
 export     : "export" <exportItem> (',' <exportItem>)* <eos> ;
 exports    : (<export> | <comment> | <eos>)* ;
 
-sourcecode : /^/ <imports> <exports> (<function> | <stmt> | <eos>)* /$/;
+wicked     : /^/ <imports> <exports> (<function> | <stmt> | <eos>)* /$/;

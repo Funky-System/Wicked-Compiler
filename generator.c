@@ -6,6 +6,9 @@
 #include <assert.h>
 
 void append_output(generator_state_t *state, const char *format, ...) {
+    if (state->fp == NULL) {
+        return;
+    }
     va_list args;
     va_start(args, format);
     vfprintf(state->fp, format, args);
@@ -15,13 +18,18 @@ void append_output(generator_state_t *state, const char *format, ...) {
 int generate(const char *filename, const char *filename_output, mpc_ast_t *ast) {
     generator_state_t state = { 0 };
     state.filename = filename;
-    state.fp = fopen(filename_output, "wb");
 
-    if (state.fp == NULL) {
-        int errnum = errno;
-        printf("Error: Could not write to file %s\n", filename_output);
-        printf("%s\n", strerror(errnum));
-        exit(EXIT_FAILURE);
+    if (filename_output != NULL) {
+        state.fp = fopen(filename_output, "wb");
+
+        if (state.fp == NULL) {
+            int errnum = errno;
+            printf("Error: Could not write to file %s\n", filename_output);
+            printf("%s\n", strerror(errnum));
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        state.fp = NULL;
     }
 
     hashmap_init(&state.symbol_table, hashmap_hash_string, hashmap_compare_string, 0);
@@ -46,7 +54,7 @@ int generate(const char *filename, const char *filename_output, mpc_ast_t *ast) 
 
     hashmap_destroy(&state.symbol_table);
 
-    fclose(state.fp);
+    if (state.fp != NULL) fclose(state.fp);
 
     return 0;
 }

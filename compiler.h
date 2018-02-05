@@ -6,5 +6,6 @@
 #define COMPILER_COMPILER_H
 
 int compile(const char *filename, const char *output_filename);
+int compiler_print_parse_tree(const char *filename, int folded);
 
 #endif //COMPILER_COMPILER_H
