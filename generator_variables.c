@@ -15,7 +15,7 @@ void generate_decl(generator_state_t *state, mpc_ast_t *ast) {
         } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
             append_output(state,"st.addr global_%d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_PARAM) {
-            append_output(state,"st.local %d\n", entry->index);
+            append_output(state,"st.arg %d\n", entry->index);
         }
     }
 }

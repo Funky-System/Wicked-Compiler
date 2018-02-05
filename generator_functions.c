@@ -67,10 +67,15 @@ void reserve_locals(generator_state_t *state, mpc_ast_t *ast, int depth, int *nu
                 if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                     struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
                     e->name = ident;
-                    e->index = cur_param - (*num_params) - 1; // - 1 for the return address
+                    e->index = cur_param;
                     e->type = SYMBOL_TYPE_PARAM;
                     symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                     cur_param++;
+                } else {
+                    fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
+                            ast->children[i]->state.row + 1,
+                            ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    exit(EXIT_FAILURE);
                 }
             }
         }
@@ -96,21 +101,15 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast) {
     // scan for locals
     int num_locals = 0, num_params = 0;
     reserve_locals(state, ast, 0, &num_locals, &num_params);
+    if (state->is_method) {
+        num_params++;
+    }
+    state->function_num_params = num_params;
     append_output(state,"args.accept %d\n", num_params);
     append_output(state,"locals.res %d\n", num_locals);
 
-    //fprintf(stderr, "Symbol table contents:\n");
-    /*struct hashmap_iter* iter = hashmap_iter(&state->symbol_table);
-    while (iter) {
-        const char *key = symbol_table_hashmap_iter_get_key(iter);
-        struct symbol_table_entry *e = symbol_table_hashmap_iter_get_data(iter);
-        //fprintf(stderr, " %d: %s (real: %s)\n", e->local_index, key, e->name);
-        iter = hashmap_iter_next(&state->symbol_table, iter);
-    }*/
-
-
     int index = mpc_ast_get_index(ast, "stmt|>");
-    if (index == -1) index = ast->children_num;
+    if (index == -1) index = ast->children_num - 2;
 
     for (int i = index; i < ast->children_num; i++) {
         if (strcmp("stmt|>", ast->children[i]->tag) == 0) {
