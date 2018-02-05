@@ -4,7 +4,7 @@
 
 #define OPTPARSE_IMPLEMENTATION
 #define OPTPARSE_API static
-#include "../optparse.h"
+#include "optparse.h"
 
 int main(int argc, char **argv) {
     struct optparse_long longopts[] = {
