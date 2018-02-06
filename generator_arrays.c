@@ -19,7 +19,7 @@ void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast) {
 void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("arrIndex|>", ast->tag));
 
-    if (state->is_lvalue && state->is_last_member) {
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         if (strcmp(ast->children[1]->tag, "exp|>") == 0 && strcmp(ast->children[2]->contents, "]") == 0) {
             generate_exp(state, ast->children[1]);
         } else if (strcmp(ast->children[1]->contents, "]") == 0) {

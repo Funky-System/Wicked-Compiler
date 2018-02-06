@@ -101,7 +101,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast) {
     // scan for locals
     int num_locals = 0, num_params = 0;
     reserve_locals(state, ast, 0, &num_locals, &num_params);
-    if (state->is_method) {
+    if (state->is_method_definition) {
         num_params++;
     }
     state->function_num_params = num_params;

@@ -9,8 +9,9 @@ eos       : (<comment> | '\n' | ';') ;
 
 arrayInit   : '[' ( <exp> ( ',' <exp> )* )? ']' ;
 range       : <factor> ".." <factor> ;
-arrIndex  : '[' (<exp> (':' <exp>)?)? ']' ;
-funCall   : '(' <exp>? (',' <exp>)* ')' ;
+arrIndex    : '[' (<exp> (':' <exp>)?)? ']' ;
+funCall     : '(' <exp>? (',' <exp>)* ')' ;
+methodCall  : <ident> <funCall> ;
 
 factor    : '(' <exp> ')'
           | <float>
@@ -22,7 +23,7 @@ factor    : '(' <exp> ')'
 
 prec20    : <factor> | <ident> ;
 prec19    : <prec20> ;
-prec18    : <prec19> (<arrIndex> | <funCall>)* ('.' <prec18>)* ;
+prec18    : <prec19> (<arrIndex> | <funCall>)* ('.' (<methodCall> | <prec18>))* ;
 prec17    : <prec18> ( "++" | "--" )* ;
 prec16    : ( "!" | "~" | "+" | "-" | "++" | "--" | "typeof" )* <prec17> ;
 prec15    : <prec16> ( ( "**" ) <exp> )? ;
@@ -44,9 +45,9 @@ exp       : <prec01> ;
 
 prec20stmt    : <factor> ;
 prec19stmt    : <prec20stmt> ;
-prec18stmt    : <prec19stmt> (<arrIndex> | <funCall>)* ('.' <prec18>)*
+prec18stmt    : <prec19stmt> (<arrIndex> | <funCall>)* ('.' (<methodCall> | <prec18>))*
               | (<prec19stmt> | <ident>) (<arrIndex> | <funCall>)+
-              | (<prec19stmt> | <ident>) (<arrIndex> | <funCall>)* '.' <prec18>;
+              | (<prec19stmt> | <ident>) (<arrIndex> | <funCall>)* '.' (<methodCall> | <prec18>);
 prec17stmt    : <prec18stmt> ( "++" | "--" )* ;
 prec16stmt    : ( "!" | "~" | "+" | "-" | "++" | "--" | "typeof" )* <prec17stmt> ;
 prec15stmt    : <prec16stmt> ( ( "**" ) <exp> )? ;

@@ -32,7 +32,7 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
             }
         }
     } else if (strcmp(ast->children[0]->tag, "expstmt|>") == 0) {
-        generate_expstmt(state, ast->children[0]);
+        generate_exp(state, ast->children[0]);
     }
 
 }

@@ -63,9 +63,9 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                     exit(EXIT_FAILURE);
                 }
 
-                state->is_method = 1;
+                state->is_method_definition = 1;
                 generate_function(state, classDecl->children[0]);
-                state->is_method = 0;
+                state->is_method_definition = 0;
             }
             if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
                 mpc_ast_t *classVar = classDecl->children[0];

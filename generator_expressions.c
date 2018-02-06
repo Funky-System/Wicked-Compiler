@@ -10,9 +10,9 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         return;
     }
 
-    if (state->is_lvalue && state->is_last_member) {
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         // this is an assignment to an ident
-        if (state->is_first_member) {
+        if (state->exp_state->is_first_member) {
             // assignment to single ident
             struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
 
@@ -32,11 +32,11 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             }
         } else {
             // assignment to member ident
-            append_output(state, "st.mapitem \"%s\"", ast->contents);
+            append_output(state, "st.mapitem \"%s\"\n", ast->contents);
         }
     } else {
         // this is a value accessor
-        if (state->is_first_member) {
+        if (state->exp_state->is_first_member) {
             // first or single member
             struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
 
@@ -55,7 +55,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             }
         } else {
             // this is not the first or single member
-            append_output(state, "ld.mapitem \"%s\"", ast->contents);
+            append_output(state, "ld.mapitem \"%s\"\n", ast->contents);
         }
     }
 }
@@ -97,13 +97,11 @@ void generate_prec20(generator_state_t *state, mpc_ast_t *ast) {
 void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("funCall|>", ast->tag));
 
-    if (state->is_lvalue && state->is_last_member) {
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: a function call is not a valid lvalue\n", state->filename, ast->state.row+1,
                 ast->state.col + 1);
         exit(EXIT_FAILURE);
     }
-
-    append_output(state, "st.reg %%r0\n");
 
     int i = 1;
     int num_arguments = 0;
@@ -120,9 +118,44 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
         i++;
     }
 
+    //append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
+
+    append_output(state,"call.pop %d\n", num_arguments);
+    append_output(state,"ld.reg %%rr\n");
+}
+
+void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
+    assert(0 == strcmp("methodCall|>", ast->tag));
+
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
+        fprintf(stderr, "%s:%ld:%ld error: a method call is not a valid lvalue\n", state->filename, ast->state.row+1,
+                ast->state.col + 1);
+        exit(EXIT_FAILURE);
+    }
+
+
+    append_output(state, "st.reg %%r0\n");
+
+    mpc_ast_t* funCall = ast->children[1];
+
+    int i = 1;
+    int num_arguments = 0;
+    while (strcmp(funCall->children[i]->contents, ")") != 0) {
+        if (strcmp(funCall->children[i]->contents, ",") == 0) {
+            i++;
+            continue;
+        }
+
+        assert(strcmp(funCall->children[i]->tag, "exp|>") == 0);
+        generate_exp(state, funCall->children[i]);
+        num_arguments++;
+
+        i++;
+    }
+
     num_arguments++;
     append_output(state, "ld.reg %%r0\ndup\n");
-    //append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
+    append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 
     append_output(state,"call.pop %d\n", num_arguments);
     append_output(state,"ld.reg %%rr\n");
@@ -141,21 +174,23 @@ void generate_prec19(generator_state_t *state, mpc_ast_t *ast) {
 void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
 //    assert(0 == strcmp("prec18|>", ast->tag));
 
-    if (ast->children_num == 1) state->is_last_member = 1;
+    if (ast->children_num == 1) state->exp_state->is_last_member = 1;
 
     generate_prec19(state, ast->children[0]);
 
-    if (state->is_first_member) state->is_first_member = 0;
+    if (state->exp_state->is_first_member) state->exp_state->is_first_member = 0;
 
     for (int i = 1; i < ast->children_num; i++) {
         if (tag_startswith(ast->children[i], "arrIndex")) {
-            if (i == ast->children_num - 1) state->is_last_member = 1;
+            if (i == ast->children_num - 1) state->exp_state->is_last_member = 1;
             generate_arrIndex(state, ast->children[i]);
         } else if (tag_startswith(ast->children[i], "funCall")) {
-            if (i == ast->children_num - 1) state->is_last_member = 1;
+            if (i == ast->children_num - 1) state->exp_state->is_last_member = 1;
             generate_funCall(state, ast->children[i]);
         } else if (tag_startswith(ast->children[i], "prec18")) {
             generate_prec18(state, ast->children[i]);
+        } else if (tag_startswith(ast->children[i], "methodCall")) {
+            generate_methodCall(state, ast->children[i]);
         }
     }
 }
@@ -164,8 +199,8 @@ void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
 void generate_prec17(generator_state_t *state, mpc_ast_t *ast) {
 //    assert(0 == strcmp("prec17|>", ast->tag));
 
-    state->is_first_member = 1;
-    state->is_last_member = 0;
+    state->exp_state->is_first_member = 1;
+    state->exp_state->is_last_member = 0;
 
     generate_prec18(state, ast->children[ast->children_num - 1]);
     for (int i = 0; i < ast->children_num - 1; i++) {
@@ -450,7 +485,7 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
 //    assert(0 == strcmp("prec03|>", ast->tag));
 
     if (ast->children_num > 1) {
-        state->has_lvalue++;
+        state->exp_state->has_lvalue++;
         if (strcmp(ast->children[1]->contents, "=") != 0) {
             // if this is not a regular assignment, but a compund OP=
             if (tag_startswith(ast->children[0], "prec04")) {
@@ -486,8 +521,8 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"or\n");
         }
 
-        state->has_lvalue--;
-        state->is_lvalue++;
+        state->exp_state->has_lvalue--;
+        state->exp_state->is_lvalue++;
     }
 
     // now, the new value for lhs is on the stack
@@ -496,15 +531,15 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
     if (tag_startswith(ast->children[0], "prec04")) {
         generate_prec04(state, ast->children[0]);
     } else if (tag_startswith(ast->children[0], "ident")) {
-        state->is_first_member++;
-        state->is_last_member++;
+        state->exp_state->is_first_member++;
+        state->exp_state->is_last_member++;
         generate_ident(state, ast->children[0]);
-        state->is_first_member--;
-        state->is_last_member--;
+        state->exp_state->is_first_member--;
+        state->exp_state->is_last_member--;
     }
 
     if (ast->children_num > 1) {
-        state->is_lvalue--;
+        state->exp_state->is_lvalue--;
 //
 //        if (state->has_lvalue) {
 //            if (tag_startswith(ast->children[0], "prec04")) {
@@ -536,13 +571,12 @@ void generate_prec01(generator_state_t *state, mpc_ast_t *ast) {
 }
 
 void generate_exp(generator_state_t *state, mpc_ast_t *ast) {
-//    assert(0 == strcmp("exp|>", ast->tag));
+    exp_state_t *this_exp_state = calloc(1, sizeof(exp_state_t));
+    exp_state_t *prev_exp_state = state->exp_state;
+    state->exp_state = this_exp_state;
 
     generate_prec01(state, ast->children[0]);
-}
 
-void generate_expstmt(generator_state_t *state, mpc_ast_t *ast) {
-//    assert(0 == strcmp("stmtexp|>", ast->tag));
-
-    generate_prec01(state, ast->children[0]);
+    state->exp_state = prev_exp_state;
+    free(this_exp_state);
 }
