@@ -1,21 +1,47 @@
-class bla
+#class bla
+#
+#    var i = 9
+#
+#    function hoi(inc)
+#        var i = 123
+#        this.i += inc
+#        return this.i
+#    end
+#
+#end
+#
+#function basic()
+#
+#end
+#
+#
+#var greet = bla()
+#var array = [0, 1, greet, 3];
+##greet.hoi(1) ; greet.hoi(1) ; greet.hoi(1)
+##var s = greet.hoi(-3)
+#var s
+#s = array[2].hoi(2)
+#
 
-    var i = 9
-
-    function hoi(inc)
-        var i = 123
-        this.i += inc
-        return this.i
-    end
-
+function a()
+    i = 123
 end
 
-function basic()
+var i = [0, 1, 2]
 
-end
+i[1] = ["A", "B", "C"]
 
-var greet = bla()
-greet.hoi(1) ; greet.hoi(1) ; greet.hoi(1)
-var s = greet.hoi(-3)
+i[1][0] = a
 
-asm ""
+asm "
+ld.deref global_0
+ld.int 1
+ld.arrelem
+trap 1
+trap 3
+"
+
+i[1][0]()
+
+asm "ld.deref global_0
+trap 1"

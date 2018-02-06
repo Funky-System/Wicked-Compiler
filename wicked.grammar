@@ -7,16 +7,10 @@ whitespace : /[ \f\n\r\t\v]*/ ;
 comment   : /#(\\.|[^\n])*/ ;
 eos       : (<comment> | '\n' | ';') ;
 
-arrayAssignIndex : '[' <exp>? ']' ;
-arrayAssign : <scopedIdent> <arrayAssignIndex>+ '=' <exp> ;
-arrayIndex  : '[' <exp> ']' ;
-arraySlice  : <scopedIdent> '[' <exp> ':' <exp> ']' ;
 arrayInit   : '[' ( <exp> ( ',' <exp> )* )? ']' ;
 range       : <factor> ".." <factor> ;
-
-scopedIdent : <ident> ('.' <ident>)* ;
-
-funCall   : <scopedIdent> '(' <exp>? (',' <exp>)* ')';
+arrIndex  : '[' (<exp> (':' <exp>)?)? ']' ;
+funCall   : '(' <exp>? (',' <exp>)* ')' ;
 
 factor    : '(' <exp> ')'
           | <float>
@@ -27,15 +21,8 @@ factor    : '(' <exp> ')'
           ;
 
 prec20    : <factor> | <ident> ;
-prec19arrindex : '[' (<exp> (':' <exp>)?)? ']' ;
-prec19arr : <prec20> <prec19arrindex>+ ;
-prec19fun : <ident> '(' <exp>? (',' <exp>)* ')' ;
-prec19mem : <prec20> "." (<prec19fun> | <prec19arr> | <prec19mem> | <ident>) ;
-prec19    : <prec19arr>
-          | <prec19fun>
-          | <prec19mem>
-          | <prec20> ;
-prec18    : <prec19> ;
+prec19    : <prec20> ;
+prec18    : <prec19> (<arrIndex> | <funCall>)* ('.' <prec18>)* ;
 prec17    : <prec18> ( "++" | "--" )* ;
 prec16    : ( "!" | "~" | "+" | "-" | "++" | "--" | "typeof" )* <prec17> ;
 prec15    : <prec16> ( ( "**" ) <exp> )? ;
@@ -56,14 +43,10 @@ prec01    : <prec02> ( "<.>" <prec02>)* ;
 exp       : <prec01> ;
 
 prec20stmt    : <factor> ;
-prec19arrstmt : (<prec20stmt> | <ident> ) <prec19arrindex>+ ;
-prec19funstmt : <ident> '(' <exp>? (',' <exp>)* ')' ;
-prec19memstmt : (<prec20stmt> | <ident>) "." (<prec19fun> | <prec19arr> | <prec19mem> | <ident>) ;
-prec19stmt    : <prec19arrstmt>
-              | <prec19funstmt>
-              | <prec19memstmt>
-              | <prec20stmt> ;
-prec18stmt    : <prec19stmt> ;
+prec19stmt    : <prec20stmt> ;
+prec18stmt    : <prec19stmt> (<arrIndex> | <funCall>)* ('.' <prec18>)*
+              | (<prec19stmt> | <ident>) (<arrIndex> | <funCall>)+
+              | (<prec19stmt> | <ident>) (<arrIndex> | <funCall>)* '.' <prec18>;
 prec17stmt    : <prec18stmt> ( "++" | "--" )* ;
 prec16stmt    : ( "!" | "~" | "+" | "-" | "++" | "--" | "typeof" )* <prec17stmt> ;
 prec15stmt    : <prec16stmt> ( ( "**" ) <exp> )? ;

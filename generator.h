@@ -23,7 +23,8 @@ typedef struct {
     int has_lvalue;
     int is_method;
     int function_num_params;
-    int is_latest_prec19;
+    int is_first_member;
+    int is_last_member;
 } generator_state_t;
 
 enum symbol_type {
@@ -61,7 +62,7 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast);
 void generate_for(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast);
-void generate_arrayIndex(generator_state_t *state, mpc_ast_t *ast);
+void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast);
 
 void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_globals);
 
