@@ -14,17 +14,21 @@
 HASHMAP_FUNCS_DECLARE(symbol_table, const char, struct symbol_table_entry)
 
 typedef struct {
+    int is_lvalue;
+    int has_lvalue;
+    int is_first_member;
+    int is_last_member;
+} exp_state_t;
+
+typedef struct {
     const char *filename;
     FILE *fp;
     struct hashmap symbol_table;
     char scope[2048];
     int uniqueid;
-    int is_lvalue;
-    int has_lvalue;
-    int is_method;
+    int is_method_definition;
     int function_num_params;
-    int is_first_member;
-    int is_last_member;
+    exp_state_t *exp_state;
 } generator_state_t;
 
 enum symbol_type {
@@ -48,7 +52,6 @@ void enter_scope(generator_state_t *state, const char* name);
 void leave_scope(generator_state_t *state);
 
 void generate_exp(generator_state_t *state, mpc_ast_t *ast);
-void generate_expstmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_factor(generator_state_t *state, mpc_ast_t *ast);
 void generate_function(generator_state_t *state, mpc_ast_t *ast);
