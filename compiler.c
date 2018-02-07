@@ -33,34 +33,35 @@ void mpc_unfold(mpc_ast_t *ast) {
     }
 }
 
-int compile(const char *filename, const char *output_filename) {
+int compile_file_to_file(const char *filename_in, const char* filename_out) {
     mpc_err_t *err = generate_parser_grammar();
 
     if (err != NULL) {
         mpc_err_print(err);
         mpc_err_delete(err);
-        exit(1);
         return 0;
     }
 
-    if (filename != NULL) {
+    if (filename_in != NULL) {
         mpc_result_t r;
-        if (mpc_parse_contents(filename, parser_wicked, &r)) {
+        if (mpc_parse_contents(filename_in, parser_wicked, &r)) {
             mpc_unfold(r.output);
-            //mpc_ast_print(r.output);
-            generate(filename, output_filename, (mpc_ast_t*)r.output);
-            mpc_ast_delete(r.output);
-        } else {
-            mpc_err_print(r.error);
-            mpc_err_delete(r.error);
-            cleanup_parser_grammar();
-            return 0;
-        }
-    } else {
-        mpc_result_t r;
-        if (mpc_parse_pipe("<stdin>", stdin, parser_wicked, &r)) {
-            mpc_ast_print(r.output);
-            generate("<stdin>", output_filename, (mpc_ast_t*)r.output);
+            char *output = generate(filename_in, (mpc_ast_t*)r.output);
+
+            FILE *fp = fopen(filename_out, "wb");
+
+            if (fp == NULL) {
+                int errnum = errno;
+                printf("Error: Could not write to file %s\n", filename_out);
+                printf("%s\n", strerror(errnum));
+                return 0;
+            }
+
+            fputs(output, fp);
+
+            fclose(fp);
+            free(output);
+
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
@@ -71,6 +72,30 @@ int compile(const char *filename, const char *output_filename) {
     }
 
     return 1;
+}
+
+char* compile_string_to_string(const char *filename_hint, const char *input) {
+    mpc_err_t *err = generate_parser_grammar();
+
+    if (err != NULL) {
+        mpc_err_print(err);
+        mpc_err_delete(err);
+        exit(1);
+        return 0;
+    }
+
+    mpc_result_t r;
+    if (mpc_parse(filename_hint, input, parser_wicked, &r)) {
+        mpc_unfold(r.output);
+        char *output = generate(filename_hint, (mpc_ast_t*)r.output);
+        mpc_ast_delete(r.output);
+        return output;
+    } else {
+        mpc_err_print(r.error);
+        mpc_err_delete(r.error);
+        cleanup_parser_grammar();
+        return 0;
+    }
 }
 
 int compiler_print_parse_tree(const char *filename, int folded) {

@@ -29,6 +29,7 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                 if (strcmp(ast->children[j]->tag, "decl|>") == 0) {
                     char *ident = ast->children[j]->children[0]->contents;
                     char *scoped_ident = malloc(strlen(ident) + 1 + depth * 2);
+                    scoped_ident[0] = '\0';
 
                     int d = depth;
                     while (d > 0) strcat(scoped_ident, "^."), d--;

@@ -6,31 +6,22 @@
 #include <assert.h>
 
 void append_output(generator_state_t *state, const char *format, ...) {
-    if (state->fp == NULL) {
-        return;
-    }
+    char buffer[strlen(format) + 2048];
+
     va_list args;
     va_start(args, format);
-    vfprintf(state->fp, format, args);
+    vsprintf(buffer, format, args);
     va_end(args);
+
+    state->output = realloc(state->output, strlen(state->output) + strlen(buffer) + 1);
+    strcat(state->output, buffer);
 }
 
-int generate(const char *filename, const char *filename_output, mpc_ast_t *ast) {
+char* generate(const char *filename_hint, mpc_ast_t *ast) {
     generator_state_t state = { 0 };
-    state.filename = filename;
+    state.filename = filename_hint;
 
-    if (filename_output != NULL) {
-        state.fp = fopen(filename_output, "wb");
-
-        if (state.fp == NULL) {
-            int errnum = errno;
-            printf("Error: Could not write to file %s\n", filename_output);
-            printf("%s\n", strerror(errnum));
-            exit(EXIT_FAILURE);
-        }
-    } else {
-        state.fp = NULL;
-    }
+    state.output = malloc(0);
 
     hashmap_init(&state.symbol_table, hashmap_hash_string, hashmap_compare_string, 0);
 
@@ -57,7 +48,5 @@ int generate(const char *filename, const char *filename_output, mpc_ast_t *ast) 
 
     hashmap_destroy(&state.symbol_table);
 
-    if (state.fp != NULL) fclose(state.fp);
-
-    return 0;
+    return state.output;
 }

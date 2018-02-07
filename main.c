@@ -84,9 +84,9 @@ int main(int argc, char **argv) {
         }
 
         if (!assemble) {
-            compile(filename, output);
+            compile_file_to_file(filename, output);
         } else  {
-            if (compile(filename, asm_output)) {
+            if (compile_file_to_file(filename, asm_output)) {
                 char *command = malloc(strlen(assembler) + strlen(asm_output) + strlen(output) + 16);
                 strcpy(command, assembler);
                 strcat(command, " \"");
