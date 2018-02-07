@@ -54,7 +54,7 @@ void leave_scope(generator_state_t *state);
 void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_factor(generator_state_t *state, mpc_ast_t *ast);
-void generate_function(generator_state_t *state, mpc_ast_t *ast);
+void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* prefix);
 void generate_block(generator_state_t *state, mpc_ast_t *ast);
 void generate_decl(generator_state_t *state, mpc_ast_t *ast);
 void generate_if(generator_state_t *state, mpc_ast_t *ast);

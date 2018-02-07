@@ -1,4 +1,14 @@
-class bla
+class mua
+
+    var mua_var = 12345
+
+    function hoi(inc)
+       return "abc" + inc
+    end
+
+end
+
+class bla extends mua
 
     var i = 9
 
@@ -6,7 +16,7 @@ class bla
         this.i = 100
     end
 
-    function hoi(inc)
+    function hoki(inc)
         var i = 123
         this.i += inc
         return this.i
@@ -18,9 +28,10 @@ function basic()
 
 end
 
-var greet = new bla(7, 6)
-
+var greet = new bla()
+#var j = greet.mua_var
+var j = greet.hoi(12)
 asm "
-ld.deref global_0
+ld.deref global_1
 trap 1
 "

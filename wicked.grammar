@@ -100,7 +100,8 @@ function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eo
 
 classVar   : "var" <decl> ( ',' <decl> )* <eos> ;
 classDecl  : ( <function> | <classVar> ) ;
-class      : "class" <ident> <eos> (<classDecl> | <eos>)* "end" <eos> ;
+extends    : "extends" <ident> ('.' <ident>)* ;
+class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 
 import     : "import" <ident> ("as" (<ident> | "*") )? <eos> ;
 imports    : (<import> | <comment> | <eos>)* ;

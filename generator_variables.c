@@ -90,6 +90,27 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                     ast->children[0]->state.col + 1, ast->children[0]->contents);
             exit(EXIT_FAILURE);
         }
+    } else if (strcmp("class|>", ast->tag) == 0) {
+        char *ident = ast->children[1]->contents;
+        if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
+
+            struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
+            e->name = ast->children[1]->contents;
+            e->index = 0;
+            e->type = SYMBOL_TYPE_CLASS;
+            symbol_table_hashmap_put(&state->symbol_table, ident, e);
+
+            append_output(state, "proto_%s: var\n", ident);
+            append_output(state, "section .text\n");
+            append_output(state, "ld.map\nst.addr proto_%s\n", ident);
+            append_output(state, "section .data\n");
+
+        } else {
+            fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
+                    ast->children[0]->state.row + 1,
+                    ast->children[0]->state.col + 1, ast->children[0]->contents);
+            exit(EXIT_FAILURE);
+        }
     }
 
     if (strcmp(ast->tag, "function|>") == 0) {
@@ -97,7 +118,7 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
     }
 
     for (int i = 0; i < ast->children_num; i++) {
-        if (strcmp(ast->children[i]->tag, "stmt|>") == 0 || strcmp(ast->children[i]->tag, "function|>") == 0) {
+        if (strcmp(ast->children[i]->tag, "stmt|>") == 0 || strcmp(ast->children[i]->tag, "function|>") == 0  || strcmp(ast->children[i]->tag, "class|>") == 0) {
             reserve_globals(state, ast->children[i], depth + 1, num_globals);
         }
     }

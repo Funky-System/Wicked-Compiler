@@ -88,13 +88,13 @@ void reserve_locals(generator_state_t *state, mpc_ast_t *ast, int depth, int *nu
     }
 }
 
-void generate_function(generator_state_t *state, mpc_ast_t *ast) {
+void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* prefix) {
     assert(0 == strcmp("function|>", ast->tag));
 
     char *name = ast->children[1]->contents;
-    append_output(state,"# Function name: %s\n", name);
-    append_output(state,"jmp %s__end\n", name);
-    append_output(state,"%s: ", name);
+    append_output(state,"# Function name: %s%s\n", prefix, name);
+    append_output(state,"jmp %s%s__end\n", prefix, name);
+    append_output(state,"%s%s: ", prefix, name);
 
     enter_scope(state, name);
 
@@ -116,7 +116,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast) {
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
             append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\nret\n");
-            append_output(state,"%s__end: ", name);
+            append_output(state,"%s%s__end: ", prefix, name);
             append_output(state,"# end\n");
         }
     }

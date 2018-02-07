@@ -10,7 +10,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         return;
     }
 
-    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
+    if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         // this is an assignment to an ident
         if (state->exp_state->is_first_member) {
             // assignment to single ident
@@ -36,7 +36,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         }
     } else {
         // this is a value accessor
-        if (state->exp_state->is_first_member) {
+        if (state->exp_state == NULL || state->exp_state->is_first_member) {
             // first or single member
             struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
 
