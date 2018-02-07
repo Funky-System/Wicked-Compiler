@@ -2,37 +2,35 @@
 #include "generator.h"
 
 
+void generate_extends(generator_state_t *state, mpc_ast_t *ast, const char* class_name) {
+
+    generate_ident(state, ast->children[1]);
+
+    int i;
+    for (i = 2; i < ast->children_num; i++) {
+        if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+            append_output(state, "ld.mapitem \"%s\"\n", ast->contents);
+        }
+    }
+
+    append_output(state, "call.pop 0\n");
+    append_output(state, "ld.reg %%rr\n");
+    append_output(state, "map.getprototype\n");
+    append_output(state, "ld.deref proto_%s\n",class_name);
+    append_output(state, "map.setprototype\n");
+
+}
+
 void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("class|>", ast->tag));
 
     char *name = ast->children[1]->contents;
-    append_output(state, "jmp %s__end\n", name);
     append_output(state, "# Class name: %s\n", name);
-    append_output(state, "# alloc %s\n", name);
-    append_output(state, "%s: \n", name);
-    append_output(state, "locals.res 1\n");
-    append_output(state, "ld.map\n");
-    append_output(state, "st.local 1\n");
 
-    char *scoped_ident = malloc(strlen(state->scope) + strlen(name) + 2);
-    if (state->scope[0] == '\0') {
-        strcpy(scoped_ident, "");
-    } else {
-        strcpy(scoped_ident, state->scope);
-        strcat(scoped_ident, ".");
-    }
-    strcat(scoped_ident, name);
-    if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
-        struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-        e->name = name;
-        e->index = 0;
-        e->type = SYMBOL_TYPE_CLASS;
-        symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
-    } else {
-        fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
-                ast->children[1]->state.row + 1,
-                ast->children[1]->state.col + 1, ast->children[1]->contents);
-        exit(EXIT_FAILURE);
+    append_output(state, "# alloc %s\n", name);
+
+    if (strcmp(ast->children[2]->tag, "extends|>") == 0) {
+        generate_extends(state, ast->children[2], name);
     }
 
     enter_scope(state, name);
@@ -44,7 +42,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
             if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
                 const char *funcName = classDecl->children[0]->children[1]->contents;
                 append_output(state, "# function: %s\n", classDecl->children[0]->children[1]->contents);
-                append_output(state, "ld.ref %s\nld.local 1\nst.mapitem \"%s\"\n", funcName, funcName);
+                append_output(state, "ld.ref %s.%s\nld.deref proto_%s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
 
                 char *scoped_ident = malloc(strlen(state->scope) + strlen(funcName) + 2);
                 strcpy(scoped_ident, state->scope);
@@ -64,7 +62,10 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                 }
 
                 state->is_method_definition = 1;
-                generate_function(state, classDecl->children[0]);
+                char prefix[128];
+                strcpy(prefix, name);
+                strcat(prefix, ".");
+                generate_function(state, classDecl->children[0], prefix);
                 state->is_method_definition = 0;
             }
             if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
@@ -77,10 +78,10 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                         if (classVar->children[j]->children_num > 1) {
                             // this decl has a def value
                             generate_exp(state, classVar->children[j]->children[2]);
-                            append_output(state, "ld.local 1\n");
+                            append_output(state, "ld.deref proto_%s\n", name);
                             append_output(state, "st.mapitem \"%s\"\n", varName);
                         } else {
-                            append_output(state, "ld.local 1\nld.empty\nst.mapitem \"%s\"\n", varName);
+                            append_output(state, "ld.deref proto_%s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
                         }
                         append_output(state, "\n");
 
@@ -106,11 +107,17 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
         }
     }
 
-    append_output(state, "ld.local 1\n");
+    append_output(state, "#allocator\n");
+    append_output(state, "jmp %s__end\n", name);
+    append_output(state, "%s:\n", name);
+    append_output(state, "ld.map\n");
+    append_output(state, "ld.deref proto_%s\n", name);
+    append_output(state, "ld.stack -1\n");
+    append_output(state, "map.setprototype\n");
     append_output(state, "st.reg %%rr\n");
-    append_output(state, "locals.cleanup\n");
     append_output(state, "ret\n");
-    append_output(state, "%s__end: ", name);
+    append_output(state, "%s__end:\n", name);
+
     append_output(state, "\n\n");
 
     leave_scope(state);
