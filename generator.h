@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     const char *filename;
-    FILE *fp;
+    char *output;
     struct hashmap symbol_table;
     char scope[2048];
     int uniqueid;
@@ -69,7 +69,7 @@ void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast);
 
 void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_globals);
 
-int generate(const char* filename, const char* filename_output, mpc_ast_t *ast);
+char *generate(const char* filename, mpc_ast_t *ast);
 void append_output(generator_state_t *state, const char *format, ...);
 
 #endif //COMPILER_GENERATOR_H

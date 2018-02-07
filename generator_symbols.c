@@ -46,6 +46,7 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
         strcat(ident, ".");
     }
     strcat(ident, scoped_ident);
+
     struct symbol_table_entry *entry = symbol_table_hashmap_get(&state->symbol_table, ident);
     while (entry == NULL) {
         char *pos = strrchr(scope, '.');
