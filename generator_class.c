@@ -8,7 +8,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     char *name = ast->children[1]->contents;
     append_output(state, "jmp %s__end\n", name);
     append_output(state, "# Class name: %s\n", name);
-    append_output(state, "# initializer%s\n", name);
+    append_output(state, "# alloc %s\n", name);
     append_output(state, "%s: \n", name);
     append_output(state, "locals.res 1\n");
     append_output(state, "ld.map\n");
@@ -111,8 +111,73 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "locals.cleanup\n");
     append_output(state, "ret\n");
     append_output(state, "%s__end: ", name);
-    append_output(state, "# end\n");
+    append_output(state, "\n\n");
 
     leave_scope(state);
 
+}
+
+void generate_newCall(generator_state_t *state, mpc_ast_t *ast) {
+    int i = 1;
+    int num_arguments = 0;
+    while (strcmp(ast->children[i]->contents, ")") != 0) {
+        if (strcmp(ast->children[i]->contents, ",") == 0) {
+            i++;
+            continue;
+        }
+
+        assert(strcmp(ast->children[i]->tag, "exp|>") == 0);
+        generate_exp(state, ast->children[i]);
+        num_arguments++;
+
+        i++;
+    }
+
+    num_arguments++;
+    append_output(state,"ld.stack -%d\n", num_arguments); // the map
+    append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
+    append_output(state,"call.pop %d\n", num_arguments);
+    append_output(state,"pop\n"); // pop the duplicated func address
+    append_output(state,"ld.reg %%rr\n");
+}
+
+void generate_new(generator_state_t *state, mpc_ast_t *ast) {
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
+        fprintf(stderr, "%s:%ld:%ld error: new operator can't be an lvalue\n", state->filename,
+                ast->children[0]->state.row + 1, ast->children[0]->state.col + 1);
+        exit(EXIT_FAILURE);
+    }
+
+    generate_ident(state, ast->children[1]);
+
+    int i;
+    for (i = 2; i < ast->children_num; i++) {
+        if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+            append_output(state, "ld.mapitem \"%s\"\n", ast->contents);
+        } else if (strcmp(ast->children[i]->tag, "funCall|>") == 0) {
+            break;
+        }
+    }
+
+    // call allocator
+    append_output(state,"call.pop 0\n");
+    append_output(state,"ld.reg %%rr\n");
+
+    // call initializer
+    append_output(state,"dup\n");
+    append_output(state,"ld.mapitem \"new\"\n");
+
+    int skipId = state->uniqueid++;
+    append_output(state,"is.empty\nbrtrue skip_%d\n", skipId);
+
+    if (strcmp(ast->children[i]->tag, "funCall|>") == 0) {
+        generate_newCall(state, ast->children[i]);
+    } else {
+        // no funCall, just call bare
+        // if no 'new' method, skip
+        append_output(state,"call.pop 0\n");
+        append_output(state,"ld.reg %%rr\n");
+        append_output(state,"jmp end_%d\n", skipId);
+    }
+    append_output(state,"skip_%d:\npop\nend_%d:\n", skipId, skipId);
 }

@@ -12,6 +12,7 @@ range       : <factor> ".." <factor> ;
 arrIndex    : '[' (<exp> (':' <exp>)?)? ']' ;
 funCall     : '(' <exp>? (',' <exp>)* ')' ;
 methodCall  : <ident> <funCall> ;
+new         : "new" <ident> ('.' <ident>)* <funCall>? ;
 
 factor    : '(' <exp> ')'
           | <float>
@@ -19,6 +20,7 @@ factor    : '(' <exp> ')'
           | <character>
           | <stringlit>
           | <arrayInit>
+          | <new>
           ;
 
 prec20    : <factor> | <ident> ;

@@ -75,6 +75,8 @@ void generate_factor(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ld.str %s\n", ast->children[0]->contents);
         } else if (strcmp(ast->children[0]->tag, "arrayInit|>") == 0) {
             generate_arrayInit(state, ast->children[0]);
+        }  else if (strcmp(ast->children[0]->tag, "new|>") == 0) {
+            generate_new(state, ast->children[0]);
         } else {
             assert(0);
         }
@@ -132,7 +134,6 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
                 ast->state.col + 1);
         exit(EXIT_FAILURE);
     }
-
 
     append_output(state, "st.reg %%r0\n");
 

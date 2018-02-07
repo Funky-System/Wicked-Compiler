@@ -2,6 +2,10 @@ class bla
 
     var i = 9
 
+    function new()
+        this.i = 100
+    end
+
     function hoi(inc)
         var i = 123
         this.i += inc
@@ -14,14 +18,9 @@ function basic()
 
 end
 
-var greet = bla()
-var array = [0, 1, greet, 3];
-#greet.hoi(1) ; greet.hoi(1) ; greet.hoi(1)
-#var s = greet.hoi(-3)
-var s
-s = array[2].hoi(array[2].hoi(4))
+var greet = new bla(7, 6)
 
 asm "
-ld.deref global_2
+ld.deref global_0
 trap 1
 "

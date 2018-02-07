@@ -55,10 +55,13 @@ void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_factor(generator_state_t *state, mpc_ast_t *ast);
 void generate_function(generator_state_t *state, mpc_ast_t *ast);
-void generate_class(generator_state_t *state, mpc_ast_t *ast);
 void generate_block(generator_state_t *state, mpc_ast_t *ast);
 void generate_decl(generator_state_t *state, mpc_ast_t *ast);
 void generate_if(generator_state_t *state, mpc_ast_t *ast);
+void generate_ident(generator_state_t *state, mpc_ast_t *ast);
+void generate_funCall(generator_state_t *state, mpc_ast_t *ast);
+void generate_methodCall(generator_state_t *state, mpc_ast_t *ast);
+void generate_methodFunCall(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast);
 void generate_do(generator_state_t* state, mpc_ast_t *ast);
@@ -68,6 +71,9 @@ void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast);
 void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast);
 
 void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_globals);
+
+void generate_class(generator_state_t *state, mpc_ast_t *ast);
+void generate_new(generator_state_t *state, mpc_ast_t *ast);
 
 char *generate(const char* filename, mpc_ast_t *ast);
 void append_output(generator_state_t *state, const char *format, ...);
