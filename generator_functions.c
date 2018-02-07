@@ -121,5 +121,6 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast) {
         }
     }
 
+    append_output(state, "\n");
     leave_scope(state);
 }
