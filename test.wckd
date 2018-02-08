@@ -1,4 +1,14 @@
-class mua
+class bar
+
+    var ba = 3
+
+    function aaa()
+        return "trrr"
+    end
+
+end
+
+class mua extends bar
 
     var mua_var = 12345
 
@@ -9,7 +19,7 @@ class mua
     end
 
     function hoki()
-        return "as" + this.i
+        return "as" + this.foo + super.aaa()
     end
 
 end

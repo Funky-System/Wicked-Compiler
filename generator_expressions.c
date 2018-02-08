@@ -186,14 +186,14 @@ void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
 
     if (ast->children_num == 1) state->exp_state->is_last_member = 1;
 
-    int is_super = 0;
-
     if (strcmp("super", ast->children[0]->contents) == 0) {
+        int skipId = state->uniqueid++;
         append_output(state,"ld.local 0\n");
-        append_output(state,"ld.local 0\n");
+        append_output(state,"dup\nhas.mapitem \"@is_instance\"\n");
+        append_output(state,"brfalse @skip_%d\n", skipId);
         append_output(state,"map.getprototype\n");
+        append_output(state,"@skip_%d:\n", skipId);
         append_output(state,"map.getprototype\n");
-        is_super = 1;
     } else {
         generate_prec19(state, ast->children[0]);
     }
@@ -210,7 +210,7 @@ void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
         } else if (tag_startswith(ast->children[i], "prec18")) {
             generate_prec18(state, ast->children[i]);
         } else if (tag_startswith(ast->children[i], "methodCall")) {
-            generate_methodCall(state, ast->children[i], is_super);
+            generate_methodCall(state, ast->children[i], 0);
         }
     }
 }
