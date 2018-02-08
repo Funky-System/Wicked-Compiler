@@ -8,7 +8,6 @@ comment   : /#([^\n])*\n/ ;
 eos       : (<comment> | '\n' | ';') ;
 
 arrayInit   : '[' ( <exp> ( ',' <exp> )* )? ']' ;
-range       : <factor> ".." <factor> ;
 arrIndex    : '[' (<exp> (':' <exp>)?)? ']' ;
 funCall     : '(' <exp>? (',' <exp>)* ')' ;
 methodCall  : <ident> <funCall> ;
