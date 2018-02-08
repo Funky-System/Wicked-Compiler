@@ -89,6 +89,9 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "ld.deref @proto_%s\n", name);
     append_output(state, "ld.stack -1\n");
     append_output(state, "map.setprototype\n");
+    append_output(state, "ld.uint 1\n");
+    append_output(state, "ld.stack -1\n");
+    append_output(state, "st.mapitem \"@is_instance\"\n");
     append_output(state, "st.reg %%rr\n");
     append_debug_leavescope(state);
     append_output(state, "ret\n");
