@@ -18,7 +18,7 @@ void reserve_locals(generator_state_t *state, mpc_ast_t *ast, int depth, int *nu
                     if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                         struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
                         e->name = ident;
-                        e->index = *num_locals + 1;
+                        e->index = *num_locals;
                         e->type = SYMBOL_TYPE_LOCAL;
                         symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                         (*num_locals)++;
@@ -38,7 +38,7 @@ void reserve_locals(generator_state_t *state, mpc_ast_t *ast, int depth, int *nu
             if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                 struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
                 e->name = ident;
-                e->index = *num_locals + 1;
+                e->index = *num_locals;
                 e->type = SYMBOL_TYPE_LOCAL;
                 symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                 (*num_locals)++;
