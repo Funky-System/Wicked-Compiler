@@ -93,20 +93,20 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
 
     char *name = ast->children[1]->contents;
     append_output(state,"# Function name: %s%s\n", prefix, name);
-    append_output(state,"jmp %s%s__end\n", prefix, name);
+    append_output(state,"jmp @%s%s__end\n", prefix, name);
     append_output(state,"%s%s: ", prefix, name);
 
     enter_scope(state, name);
 
     // scan for locals
-    int num_locals = 0, num_params = 0;
+    int num_locals = 1 /* this is first local */, num_params = 0;
     reserve_locals(state, ast, 0, &num_locals, &num_params);
-    if (state->is_method_definition) {
-        num_params++;
-    }
-    state->function_num_params = num_params;
     append_output(state,"args.accept %d\n", num_params);
     append_output(state,"locals.res %d\n", num_locals);
+    if (state->is_method_definition) {
+        append_output(state, "ld.reg %%r1\n");
+        append_output(state, "st.local 0\n");
+    }
 
     int index = mpc_ast_get_index(ast, "stmt|>");
     if (index == -1) index = ast->children_num - 2;
@@ -116,7 +116,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
             append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\nret\n");
-            append_output(state,"%s%s__end: ", prefix, name);
+            append_output(state,"@%s%s__end: ", prefix, name);
             append_output(state,"# end\n");
         }
     }

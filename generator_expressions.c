@@ -6,7 +6,7 @@
 
 void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
     if (strcmp(ast->contents, "this") == 0) {
-        append_output(state,"ld.arg %d\n", state->function_num_params - 1);
+        append_output(state,"ld.local 0\n");
         return;
     }
 
@@ -19,7 +19,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             if (entry->type == SYMBOL_TYPE_LOCAL) {
                 append_output(state, "st.local %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-                append_output(state, "st.addr global_%d\n", entry->index);
+                append_output(state, "st.addr @global_%d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_PARAM) {
                 append_output(state, "st.arg %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
@@ -28,7 +28,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
                         ast->state.col + 1, ast->contents);
                 exit(EXIT_FAILURE);
             } else if (entry->type == SYMBOL_TYPE_FIELD) {
-                append_output(state, "ld.arg %d\nst.mapitem \"%s\"\n", state->function_num_params - 1, entry->name);
+                append_output(state, "ld.local 0\nst.mapitem \"%s\"\n", entry->name);
             }
         } else {
             // assignment to member ident
@@ -43,7 +43,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             if (entry->type == SYMBOL_TYPE_LOCAL) {
                 append_output(state, "ld.local %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-                append_output(state, "ld.deref global_%d\n", entry->index);
+                append_output(state, "ld.deref @global_%d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_PARAM) {
                 append_output(state, "ld.arg %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
@@ -51,7 +51,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             } else if (entry->type == SYMBOL_TYPE_CLASS) {
                 append_output(state, "ld.ref %s\n", entry->name);
             } else if (entry->type == SYMBOL_TYPE_FIELD) {
-                append_output(state, "ld.arg %d\nld.mapitem \"%s\"\n", state->function_num_params - 1, entry->name);
+                append_output(state, "ld.local 0\nld.mapitem \"%s\"\n", entry->name);
             }
         } else {
             // this is not the first or single member
@@ -122,8 +122,9 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
 
     //append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 
+    append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
     append_output(state,"call.pop %d\n", num_arguments);
-    append_output(state,"ld.reg %%rr\n");
+    append_output(state,"pop\nld.reg %%rr\n");
 }
 
 void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
@@ -135,7 +136,8 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
         exit(EXIT_FAILURE);
     }
 
-    append_output(state, "st.reg %%r0\n");
+    append_output(state, "dup\n");
+    append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 
     mpc_ast_t* funCall = ast->children[1];
 
@@ -154,11 +156,12 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
         i++;
     }
 
-    num_arguments++;
-    append_output(state, "ld.reg %%r0\ndup\n");
-    append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
-
+    append_output(state,"ld.stack -%d\n", num_arguments + 1); // the map
+    append_output(state,"st.reg %%r1\n", num_arguments); // the map
+    append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
     append_output(state,"call.pop %d\n", num_arguments);
+    append_output(state,"pop\n"); // pop the duplicated func address
+    append_output(state,"pop\n"); // pop the duplicated map
     append_output(state,"ld.reg %%rr\n");
 }
 

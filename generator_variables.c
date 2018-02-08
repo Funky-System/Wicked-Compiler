@@ -13,7 +13,7 @@ void generate_decl(generator_state_t *state, mpc_ast_t *ast) {
         if (entry->type == SYMBOL_TYPE_LOCAL) {
             append_output(state,"st.local %d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-            append_output(state,"st.addr global_%d\n", entry->index);
+            append_output(state,"st.addr @global_%d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_PARAM) {
             append_output(state,"st.arg %d\n", entry->index);
         }
@@ -42,7 +42,7 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                         e->type = SYMBOL_TYPE_GLOBAL;
                         symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                         (*num_globals)++;
-                        append_output(state,"global_%d: var\n", e->index);
+                        append_output(state,"@global_%d: var\n", e->index);
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                                 ast->children[0]->state.row + 1,
@@ -67,7 +67,7 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                 e->type = SYMBOL_TYPE_GLOBAL;
                 symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                 (*num_globals)++;
-                append_output(state,"global_%d: var\n", e->index);
+                append_output(state,"@global_%d: var\n", e->index);
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                         ast->children[0]->state.row + 1,
@@ -100,9 +100,9 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
             e->type = SYMBOL_TYPE_CLASS;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
 
-            append_output(state, "proto_%s: var\n", ident);
+            append_output(state, "@proto_%s: var\n", ident);
             append_output(state, "section .text\n");
-            append_output(state, "ld.map\nst.addr proto_%s\n", ident);
+            append_output(state, "ld.map\nst.addr @proto_%s\n", ident);
             append_output(state, "section .data\n");
 
         } else {

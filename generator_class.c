@@ -16,7 +16,7 @@ void generate_extends(generator_state_t *state, mpc_ast_t *ast, const char* clas
     append_output(state, "call.pop 0\n");
     append_output(state, "ld.reg %%rr\n");
     append_output(state, "map.getprototype\n");
-    append_output(state, "ld.deref proto_%s\n",class_name);
+    append_output(state, "ld.deref @proto_%s\n",class_name);
     append_output(state, "map.setprototype\n");
 
 }
@@ -42,7 +42,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
             if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
                 const char *funcName = classDecl->children[0]->children[1]->contents;
                 append_output(state, "# function: %s\n", classDecl->children[0]->children[1]->contents);
-                append_output(state, "ld.ref %s.%s\nld.deref proto_%s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
+                append_output(state, "ld.ref %s.%s\nld.deref @proto_%s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
 
                 char *scoped_ident = malloc(strlen(state->scope) + strlen(funcName) + 2);
                 strcpy(scoped_ident, state->scope);
@@ -57,7 +57,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                 } else {
                     fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                             classDecl->children[0]->state.row + 1,
-                            classDecl->children[0]->state.col + 1, classDecl->children[0]->contents);
+                            classDecl->children[0]->state.col + 1, classDecl->children[0]->children[1]->contents);
                     exit(EXIT_FAILURE);
                 }
 
@@ -78,10 +78,10 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                         if (classVar->children[j]->children_num > 1) {
                             // this decl has a def value
                             generate_exp(state, classVar->children[j]->children[2]);
-                            append_output(state, "ld.deref proto_%s\n", name);
+                            append_output(state, "ld.deref @proto_%s\n", name);
                             append_output(state, "st.mapitem \"%s\"\n", varName);
                         } else {
-                            append_output(state, "ld.deref proto_%s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
+                            append_output(state, "ld.deref @proto_%s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
                         }
                         append_output(state, "\n");
 
@@ -108,15 +108,15 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     }
 
     append_output(state, "#allocator\n");
-    append_output(state, "jmp %s__end\n", name);
+    append_output(state, "jmp @%s__end\n", name);
     append_output(state, "%s:\n", name);
     append_output(state, "ld.map\n");
-    append_output(state, "ld.deref proto_%s\n", name);
+    append_output(state, "ld.deref @proto_%s\n", name);
     append_output(state, "ld.stack -1\n");
     append_output(state, "map.setprototype\n");
     append_output(state, "st.reg %%rr\n");
     append_output(state, "ret\n");
-    append_output(state, "%s__end:\n", name);
+    append_output(state, "@%s__end:\n", name);
 
     append_output(state, "\n\n");
 
@@ -140,12 +140,11 @@ void generate_newCall(generator_state_t *state, mpc_ast_t *ast) {
         i++;
     }
 
-    num_arguments++;
-    append_output(state,"ld.stack -%d\n", num_arguments); // the map
+    append_output(state,"ld.stack -%d\n", num_arguments + 1); // the map
+    append_output(state,"st.reg %%r1\n", num_arguments); // the map
     append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
     append_output(state,"call.pop %d\n", num_arguments);
-    append_output(state,"pop\n"); // pop the duplicated func address
-    append_output(state,"ld.reg %%rr\n");
+    //append_output(state,"pop\n"); // pop the duplicated func address
 }
 
 void generate_new(generator_state_t *state, mpc_ast_t *ast) {
@@ -175,16 +174,17 @@ void generate_new(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state,"ld.mapitem \"new\"\n");
 
     int skipId = state->uniqueid++;
-    append_output(state,"is.empty\nbrtrue skip_%d\n", skipId);
+    append_output(state,"is.empty\nbrtrue @skip_%d\n", skipId);
 
-    if (strcmp(ast->children[i]->tag, "funCall|>") == 0) {
+    if (i < ast->children_num && strcmp(ast->children[i]->tag, "funCall|>") == 0) {
         generate_newCall(state, ast->children[i]);
     } else {
         // no funCall, just call bare
         // if no 'new' method, skip
+        append_output(state,"ld.stack -1\n"); // the map
+        append_output(state,"st.reg %%r1\n"); // the map
+        append_output(state,"ld.stack 0\n"); // the address of the function
         append_output(state,"call.pop 0\n");
-        append_output(state,"ld.reg %%rr\n");
-        append_output(state,"jmp end_%d\n", skipId);
     }
-    append_output(state,"skip_%d:\npop\nend_%d:\n", skipId, skipId);
+    append_output(state,"@skip_%d:\npop\n@end_%d:\n", skipId, skipId);
 }
