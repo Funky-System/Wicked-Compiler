@@ -38,16 +38,16 @@ function basic(i)
 end
 
 var ctr = 100;
-var i = 0
+var ki = 0
 
 #kj
 
-while i < 60*60*60*60 do
+while ki < 60*60*60*60 do
     var greet = new bla(8)
     var j = greet.mua_var
-    j = greet.hoi(basic(3)) * i
-    ctr += i
-    i += 1
+    j = greet.hoi(basic(3)) * ki
+    ctr += ki
+    ki += 1
 end
 
 #j = basic(9)

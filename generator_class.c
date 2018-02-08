@@ -44,23 +44,6 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                 const char *funcName = classDecl->children[0]->children[1]->contents;
                 append_output(state, "# function: %s\n", classDecl->children[0]->children[1]->contents);
                 append_output(state, "ld.ref %s.%s\nld.deref @proto_%s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
-
-                char *scoped_ident = malloc(strlen(state->scope) + strlen(funcName) + 2);
-                strcpy(scoped_ident, state->scope);
-                strcat(scoped_ident, ".");
-                strcat(scoped_ident, funcName);
-                if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
-                    struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-                    e->name = funcName;
-                    e->index = 0;
-                    e->type = SYMBOL_TYPE_FUNCTION;
-                    symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
-                } else {
-                    fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
-                            classDecl->children[0]->state.row + 1,
-                            classDecl->children[0]->state.col + 1, classDecl->children[0]->children[1]->contents);
-                    exit(EXIT_FAILURE);
-                }
             }
             if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
                 mpc_ast_t *classVar = classDecl->children[0];
@@ -78,31 +61,11 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                             append_output(state, "ld.deref @proto_%s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
                         }
                         append_output(state, "\n");
-
-                        char *scoped_ident = malloc(strlen(state->scope) + strlen(varName) + 2);
-                        strcpy(scoped_ident, state->scope);
-                        strcat(scoped_ident, ".");
-                        strcat(scoped_ident, varName);
-                        if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
-                            struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-                            e->name = varName;
-                            e->index = 0;
-                            e->type = SYMBOL_TYPE_FIELD;
-                            symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
-                        } else {
-                            fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
-                                    classDecl->children[0]->state.row + 1,
-                                    classDecl->children[0]->state.col + 1, classDecl->children[0]->contents);
-                            exit(EXIT_FAILURE);
-                        }
                     }
                 }
             }
         }
     }
-
-    //printf("Symbol table after class %s\n", name);
-    //print_symbol_table(state);
 
     for (int i = 3; i < ast->children_num; i++) {
         if (strcmp("classDecl|>", ast->children[i]->tag) == 0) {
