@@ -46,13 +46,12 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                                 ast->children[0]->state.row + 1,
-                                ast->children[0]->state.col + 1, ast->children[0]->contents);
+                                ast->children[0]->state.col + 1, ident);
                         exit(EXIT_FAILURE);
                     }
                 }
             }
-        }
-        if (strcmp("for", ast->children[0]->contents) == 0) {
+        } else if (strcmp("for", ast->children[0]->contents) == 0) {
             char *ident = ast->children[1]->contents;
             char *scoped_ident = malloc(strlen(ident) + 1 + depth * 2);
 
@@ -74,6 +73,8 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                         ast->children[0]->state.col + 1, ast->children[0]->contents);
                 exit(EXIT_FAILURE);
             }
+
+            reserve_globals(state, ast->children[5], depth + 1, num_globals);
         }
     } else if (strcmp("function|>", ast->tag) == 0) {
         char *ident = ast->children[1]->contents;
@@ -118,7 +119,12 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
     }
 
     for (int i = 0; i < ast->children_num; i++) {
-        if (strcmp(ast->children[i]->tag, "stmt|>") == 0 || strcmp(ast->children[i]->tag, "function|>") == 0  || strcmp(ast->children[i]->tag, "class|>") == 0) {
+        if (strcmp(ast->children[i]->tag, "stmt|>") == 0 ||
+                strcmp(ast->children[i]->tag, "function|>") == 0  ||
+                strcmp(ast->children[i]->tag, "class|>") == 0 ||
+                strcmp(ast->children[i]->tag, "block|>") == 0 ||
+                strcmp(ast->children[i]->tag, "ifBlock|>") == 0 ||
+                strcmp(ast->children[i]->tag, "doBlock|>") == 0 ) {
             reserve_globals(state, ast->children[i], depth + 1, num_globals);
         }
     }

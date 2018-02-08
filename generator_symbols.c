@@ -6,6 +6,9 @@
 HASHMAP_FUNCS_CREATE(symbol_table, const char, struct symbol_table_entry)
 
 struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const char* ident) {
+    char *scope = malloc(strlen(state->scope) + 1);
+    strcpy(scope, state->scope);
+
     char* scoped_ident = malloc(strlen(state->scope) + strlen(ident) + 2);
     scoped_ident[0] = '\0';
     if (state->scope[0] != '\0') {
@@ -13,11 +16,27 @@ struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const
         strcat(scoped_ident, ".");
     }
     strcat(scoped_ident, ident);
+
     struct symbol_table_entry *entry = symbol_table_hashmap_get(&state->symbol_table, scoped_ident);
-    if (entry == NULL) {
-        fprintf(stderr, "%s:%ld:%ld error: '%s' is not defined\n", state->filename, -1l, -1l, ident);
-        exit(EXIT_FAILURE);
+    while (entry == NULL) {
+        char *pos = strrchr(scope, '.');
+        if(pos == NULL) {
+            entry = symbol_table_hashmap_get(&state->symbol_table, ident);
+            if (entry == NULL) {
+                fprintf(stderr, "%s:%d:%d error: '%s' is not defined\n", state->filename,
+                        -1,
+                        -1, ident);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            *scoped_ident = '\0';
+            strncat(scoped_ident, scope, pos - scope + 1);
+            strcat(scoped_ident, scoped_ident);
+            pos[0] = '\0';
+            entry = symbol_table_hashmap_get(&state->symbol_table, scoped_ident);
+        }
     }
+
     free(scoped_ident);
 
     return entry;
