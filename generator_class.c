@@ -61,13 +61,6 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                             classDecl->children[0]->state.col + 1, classDecl->children[0]->children[1]->contents);
                     exit(EXIT_FAILURE);
                 }
-
-                state->is_method_definition = 1;
-                char prefix[128];
-                strcpy(prefix, name);
-                strcat(prefix, ".");
-                generate_function(state, classDecl->children[0], prefix);
-                state->is_method_definition = 0;
             }
             if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
                 mpc_ast_t *classVar = classDecl->children[0];
@@ -104,6 +97,23 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    //printf("Symbol table after class %s\n", name);
+    //print_symbol_table(state);
+
+    for (int i = 3; i < ast->children_num; i++) {
+        if (strcmp("classDecl|>", ast->children[i]->tag) == 0) {
+            mpc_ast_t *classDecl = ast->children[i];
+            if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
+                state->is_method_definition = 1;
+                char prefix[128];
+                strcpy(prefix, name);
+                strcat(prefix, ".");
+                generate_function(state, classDecl->children[0], prefix);
+                state->is_method_definition = 0;
             }
         }
     }

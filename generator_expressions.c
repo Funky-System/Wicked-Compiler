@@ -501,7 +501,9 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
             if (tag_startswith(ast->children[0], "prec04")) {
                 generate_prec04(state, ast->children[0]);
             } else if (tag_startswith(ast->children[0], "ident")) {
+                state->exp_state->is_first_member = 1;
                 generate_ident(state, ast->children[0]);
+                state->exp_state->is_first_member = 0;
             }
         }
 

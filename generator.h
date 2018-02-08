@@ -69,7 +69,9 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast);
 void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast);
 void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast);
 
-void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_globals);
+void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_locals, int *num_params,
+                           enum symbol_type type);
+void print_symbol_table(generator_state_t *state);
 
 void generate_class(generator_state_t *state, mpc_ast_t *ast);
 void generate_new(generator_state_t *state, mpc_ast_t *ast);

@@ -13,7 +13,11 @@ class bla extends mua
     var i = 9
 
     function new(k)
+        #this.i = 2 * k
         this.i = 2 * k
+        for i in 1..5 do
+            this.i += 1
+        end
     end
 
     function hoi(inc)
@@ -33,14 +37,21 @@ function basic(i)
     return 199 + i
 end
 
-for i in [1..60*60] do
-    var greet = new bla(3)
+var ctr = 100;
+var i = 0
+
+#kj
+
+while i < 60*60*60*60 do
+    var greet = new bla(8)
     var j = greet.mua_var
-    j = greet.hoi(basic(3))
+    j = greet.hoi(basic(3)) * i
+    ctr += i
+    i += 1
 end
 
 #j = basic(9)
 asm "
-ld.deref @global_1
+ld.deref @global_0
 trap 1
 "

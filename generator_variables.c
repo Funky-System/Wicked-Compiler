@@ -20,16 +20,25 @@ void generate_decl(generator_state_t *state, mpc_ast_t *ast) {
     }
 }
 
-void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_globals) {
-    if (depth == -1) append_output(state,"section .data\n");
+void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_locals, int *num_params,
+                           enum symbol_type type) {
+    int in_data_section = 0;
+    if (type == SYMBOL_TYPE_GLOBAL && depth == -1) {
+        append_output(state,"section .data\n");
+        in_data_section = 1;
+        depth = 0;
+    }
 
     if (strcmp("stmt|>", ast->tag) == 0) {
         if (strcmp("var", ast->children[0]->contents) == 0) {
             for (int j = 0; j < ast->children_num; j++) {
                 if (strcmp(ast->children[j]->tag, "decl|>") == 0) {
                     char *ident = ast->children[j]->children[0]->contents;
-                    char *scoped_ident = malloc(strlen(ident) + 1 + depth * 2);
-                    scoped_ident[0] = '\0';
+                    char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + 2);
+                    if (strlen(state->scope) > 0) {
+                        strcpy(scoped_ident, state->scope);
+                        strcat(scoped_ident, ".");
+                    }
 
                     int d = depth;
                     while (d > 0) strcat(scoped_ident, "^."), d--;
@@ -38,11 +47,11 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
                     if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                         struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
                         e->name = ident;
-                        e->index = *num_globals;
-                        e->type = SYMBOL_TYPE_GLOBAL;
+                        e->index = *num_locals;
+                        e->type = type;
                         symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
-                        (*num_globals)++;
-                        append_output(state,"@global_%d: var\n", e->index);
+                        (*num_locals)++;
+                        if (type == SYMBOL_TYPE_GLOBAL) append_output(state,"@global_%d: var\n", e->index);
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                                 ast->children[0]->state.row + 1,
@@ -53,7 +62,11 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
             }
         } else if (strcmp("for", ast->children[0]->contents) == 0) {
             char *ident = ast->children[1]->contents;
-            char *scoped_ident = malloc(strlen(ident) + 1 + depth * 2);
+            char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + depth * 2 + 2);
+            if (strlen(state->scope) > 0) {
+                strcpy(scoped_ident, state->scope);
+                strcat(scoped_ident, ".");
+            }
 
             int d = depth + 1;
             while (d > 0) strcat(scoped_ident, "^."), d--;
@@ -62,21 +75,49 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
             if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                 struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
                 e->name = ident;
-                e->index = *num_globals;
-                e->type = SYMBOL_TYPE_GLOBAL;
+                e->index = *num_locals;
+                e->type = type;
                 symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
-                (*num_globals)++;
-                append_output(state,"@global_%d: var\n", e->index);
+                (*num_locals)++;
+                if (type == SYMBOL_TYPE_GLOBAL) append_output(state,"@global_%d: var\n", e->index);
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                         ast->children[0]->state.row + 1,
                         ast->children[0]->state.col + 1, ast->children[0]->contents);
                 exit(EXIT_FAILURE);
             }
-
-            reserve_globals(state, ast->children[5], depth + 1, num_globals);
         }
-    } else if (strcmp("function|>", ast->tag) == 0) {
+    } else if (strcmp("args|>", ast->tag) == 0) {
+        *num_params = 0;
+        for (int i = 0; i < ast->children_num; i++) {
+            if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+                (*num_params)++;
+            }
+        }
+        int cur_param = 0;
+        for (int i = 0; i < ast->children_num; i++) {
+            if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+                char *ident = ast->children[i]->contents;
+                char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + 2);
+                strcpy(scoped_ident, state->scope);
+                strcat(scoped_ident, ".");
+                strcat(scoped_ident, ident);
+                if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
+                    struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
+                    e->name = ident;
+                    e->index = cur_param;
+                    e->type = SYMBOL_TYPE_PARAM;
+                    symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
+                    cur_param++;
+                } else {
+                    fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
+                            ast->children[i]->state.row + 1,
+                            ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+    } else if (type == SYMBOL_TYPE_GLOBAL && strcmp("function|>", ast->tag) == 0) {
         char *ident = ast->children[1]->contents;
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
@@ -88,10 +129,10 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                     ast->children[0]->state.row + 1,
-                    ast->children[0]->state.col + 1, ast->children[0]->contents);
+                    ast->children[0]->state.col + 1, ident);
             exit(EXIT_FAILURE);
         }
-    } else if (strcmp("class|>", ast->tag) == 0) {
+    } else if (type == SYMBOL_TYPE_GLOBAL && strcmp("class|>", ast->tag) == 0) {
         char *ident = ast->children[1]->contents;
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
@@ -114,20 +155,19 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
         }
     }
 
-    if (strcmp(ast->tag, "function|>") == 0) {
+    if (type == SYMBOL_TYPE_GLOBAL && strcmp(ast->tag, "function|>") == 0) {
+        return;
+    }
+
+    if (type == SYMBOL_TYPE_GLOBAL && strcmp(ast->tag, "class|>") == 0) {
         return;
     }
 
     for (int i = 0; i < ast->children_num; i++) {
-        if (strcmp(ast->children[i]->tag, "stmt|>") == 0 ||
-                strcmp(ast->children[i]->tag, "function|>") == 0  ||
-                strcmp(ast->children[i]->tag, "class|>") == 0 ||
-                strcmp(ast->children[i]->tag, "block|>") == 0 ||
-                strcmp(ast->children[i]->tag, "ifBlock|>") == 0 ||
-                strcmp(ast->children[i]->tag, "doBlock|>") == 0 ) {
-            reserve_globals(state, ast->children[i], depth + 1, num_globals);
-        }
+        int sub_depth = depth;
+        if (strcmp(ast->tag, "stmt|>") == 0) sub_depth++;
+        populate_symbol_table(state, ast->children[i], sub_depth, num_locals, num_params, type);
     }
 
-    if (depth == -1) append_output(state,"\nsection .text\n");
+    if (in_data_section) append_output(state,"\nsection .text\n");
 }

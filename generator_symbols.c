@@ -129,3 +129,13 @@ void leave_scope(generator_state_t *state) {
 
     *pos = '\0';
 }
+
+void print_symbol_table(generator_state_t *state) {
+    printf("Symbol table:\n");
+    for (struct hashmap_iter *iter = hashmap_iter(&state->symbol_table); iter; iter = hashmap_iter_next(&state->symbol_table, iter)) {
+        printf("%d '%s': '%s' -> %d\n", symbol_table_hashmap_iter_get_data(iter)->type, symbol_table_hashmap_iter_get_key(iter),
+               symbol_table_hashmap_iter_get_data(iter)->name, symbol_table_hashmap_iter_get_data(iter)->index);
+    }
+
+    printf("\n");
+}
