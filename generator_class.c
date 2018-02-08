@@ -3,7 +3,7 @@
 
 
 void generate_extends(generator_state_t *state, mpc_ast_t *ast, const char* class_name) {
-
+    append_debug_setcontext(state, ast);
     generate_ident(state, ast->children[1]);
 
     int i;
@@ -23,6 +23,7 @@ void generate_extends(generator_state_t *state, mpc_ast_t *ast, const char* clas
 
 void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("class|>", ast->tag));
+    append_debug_setcontext(state, ast);
 
     char *name = ast->children[1]->contents;
     append_output(state, "# Class name: %s\n", name);
@@ -110,11 +111,13 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "#allocator\n");
     append_output(state, "jmp @%s__end\n", name);
     append_output(state, "%s:\n", name);
+    append_debug_enterscope(state, name, "@alloc");
     append_output(state, "ld.map\n");
     append_output(state, "ld.deref @proto_%s\n", name);
     append_output(state, "ld.stack -1\n");
     append_output(state, "map.setprototype\n");
     append_output(state, "st.reg %%rr\n");
+    append_debug_leavescope(state);
     append_output(state, "ret\n");
     append_output(state, "@%s__end:\n", name);
 
@@ -125,6 +128,8 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
 }
 
 void generate_newCall(generator_state_t *state, mpc_ast_t *ast) {
+    append_debug_setcontext(state, ast);
+
     int i = 1;
     int num_arguments = 0;
     while (strcmp(ast->children[i]->contents, ")") != 0) {
@@ -148,6 +153,8 @@ void generate_newCall(generator_state_t *state, mpc_ast_t *ast) {
 }
 
 void generate_new(generator_state_t *state, mpc_ast_t *ast) {
+    append_debug_setcontext(state, ast);
+
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: new operator can't be an lvalue\n", state->filename,
                 ast->children[0]->state.row + 1, ast->children[0]->state.col + 1);

@@ -94,7 +94,9 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     char *name = ast->children[1]->contents;
     append_output(state,"# Function name: %s%s\n", prefix, name);
     append_output(state,"jmp @%s%s__end\n", prefix, name);
-    append_output(state,"%s%s: ", prefix, name);
+    append_output(state,"%s%s: \n", prefix, name);
+
+    append_debug_enterscope(state, prefix, name);
 
     enter_scope(state, name);
 
@@ -115,7 +117,9 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
         if (strcmp("stmt|>", ast->children[i]->tag) == 0) {
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
-            append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\nret\n");
+            append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\n");
+            append_debug_leavescope(state);
+            append_output(state,"ret\n");
             append_output(state,"@%s%s__end: ", prefix, name);
             append_output(state,"# end\n");
         }

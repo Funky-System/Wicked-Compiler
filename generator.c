@@ -4,6 +4,7 @@
 
 #include "generator.h"
 #include <assert.h>
+#include <mpc/mpc.h>
 
 void append_output(generator_state_t *state, const char *format, ...) {
     char buffer[strlen(format) + 2048];
@@ -17,11 +18,33 @@ void append_output(generator_state_t *state, const char *format, ...) {
     strcat(state->output, buffer);
 }
 
-char* generate(const char *filename_hint, mpc_ast_t *ast) {
+void append_debug_setcontext(generator_state_t *state, mpc_ast_t *ast) {
+    if (!state->debug) return;
+
+    append_output(state, "debug.setcontext @filename, %d, %d\n", ast->state.row + 1, ast->state.col);
+}
+
+void append_debug_enterscope(generator_state_t *state, const char* prefix, const char* name) {
+    if (!state->debug) return;
+
+    append_output(state, "debug.enterscope \"%s%s\"\n", prefix, name);
+}
+
+void append_debug_leavescope(generator_state_t *state) {
+    if (!state->debug) return;
+
+    append_output(state, "debug.leavescope\n");
+}
+
+char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     generator_state_t state = { 0 };
     state.filename = filename_hint;
 
     state.output = malloc(0);
+
+    state.debug = debug;
+
+    append_output(&state, "section .data\n@filename: data \"%s\"\nsection .text\n\n", filename_hint);
 
     hashmap_init(&state.symbol_table, hashmap_hash_string, hashmap_compare_string, 0);
 
