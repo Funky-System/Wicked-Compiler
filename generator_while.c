@@ -66,7 +66,7 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast) {
     if (i->type == SYMBOL_TYPE_LOCAL) {
         append_output(state,"st.local %d\n", i->index);
     } else if (i->type == SYMBOL_TYPE_GLOBAL) {
-        append_output(state,"st.addr global_%d\n", i->index);
+        append_output(state,"st.addr @global_%d\n", i->index);
     }
 
     generate_block(state, ast->children[5]);

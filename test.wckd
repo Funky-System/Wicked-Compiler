@@ -12,26 +12,31 @@ class bla extends mua
 
     var i = 9
 
-    function new()
+    function new(k)
         this.i = 100
     end
 
-    function hoki(inc)
-        var i = 123
-        this.i += inc
-        return this.i
-    end
+    function hoi(inc)
+            var i = 123
+            this.i += inc
+            return this.i
+        end
+
+        function hoki()
+                return 99
+            end
 
 end
 
-function basic()
-
+function basic(i)
+    return 199 + i
 end
 
-var greet = new bla()
+var greet = new bla
 #var j = greet.mua_var
-var j = greet.hoi(12)
+var j = greet.hoki()
+j = basic(9)
 asm "
-ld.deref global_1
+ld.deref @global_1
 trap 1
 "

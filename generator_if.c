@@ -9,8 +9,8 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
     generate_exp(state, ast->children[1]);
 
     char elselabel[19], endlabel[19];
-    sprintf(elselabel, "else_%d", state->uniqueid);
-    sprintf(endlabel, "endif_%d", state->uniqueid++);
+    sprintf(elselabel, "@else_%d", state->uniqueid);
+    sprintf(endlabel, "@endif_%d", state->uniqueid++);
     int elsefound = 0;
     append_output(state,"brfalse %s\n", elselabel);
 
