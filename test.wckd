@@ -33,9 +33,12 @@ function basic(i)
     return 199 + i
 end
 
-var greet = new bla(3)
-#var j = greet.mua_var
-var j = greet.hoi(basic(3))
+for i in [1..60*60] do
+    var greet = new bla(3)
+    var j = greet.mua_var
+    j = greet.hoi(basic(3))
+end
+
 #j = basic(9)
 asm "
 ld.deref @global_1
