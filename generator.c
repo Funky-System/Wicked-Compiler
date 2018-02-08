@@ -56,8 +56,10 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     // the last child is a regex for '$'
     assert(0 == strcmp("regex", ast->children[ast->children_num - 1]->tag));
 
-    int num_globals = 0;
-    reserve_globals(&state, ast, -1, &num_globals);
+    int num_globals = 0, num_params = 0;
+    populate_symbol_table(&state, ast, -1, &num_globals, &num_params, SYMBOL_TYPE_GLOBAL);
+    //printf("symbol table after globals:\n");
+    //print_symbol_table(&state);
 
     for (int i = 1; i < (ast->children_num - 1); i++) {
         mpc_ast_t *part = ast->children[i];

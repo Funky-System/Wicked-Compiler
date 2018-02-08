@@ -4,7 +4,7 @@ float     : /-?[0-9]+\.[0-9]+/ ;
 character : /'(\\)?.'/ ;
 stringlit : /"(\\.|[^"])*"/ ;
 whitespace : /[ \f\n\r\t\v]*/ ;
-comment   : /#(\\.|[^\n])*/ ;
+comment   : /#([^\n])*\n/ ;
 eos       : (<comment> | '\n' | ';') ;
 
 arrayInit   : '[' ( <exp> ( ',' <exp> )* )? ']' ;
