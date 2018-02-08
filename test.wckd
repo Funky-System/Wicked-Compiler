@@ -2,8 +2,14 @@ class mua
 
     var mua_var = 12345
 
+    var foo = 1009
+
     function hoi(inc)
        return "abc" + inc
+    end
+
+    function hoki()
+        return "as" + this.i
     end
 
 end
@@ -11,6 +17,8 @@ end
 class bla extends mua
 
     var i = 9
+
+    var foo = 4
 
     function new(k)
         #this.i = 2 * k
@@ -31,6 +39,10 @@ class bla extends mua
         return 4
     end
 
+    function test()
+        return super.hoki()
+    end
+
 end
 
 function basic(i)
@@ -42,13 +54,15 @@ var ki = 0
 
 #kj
 
-while ki < 60*60*60*60 do
-    var greet = new bla(8)
-    var j = greet.mua_var
-    j = greet.hoi(basic(3)) * ki
-    ctr += ki
-    ki += 1
-end
+#while ki < 60*60*60 do
+#    var greet = new bla(8)
+#    var j = greet.mua_var
+#    j = greet.hoi(basic(3)) * ki
+#    ctr += ki
+#    ki += 1
+#end
+
+ctr = new bla(3).test()
 
 #j = basic(9)
 asm "

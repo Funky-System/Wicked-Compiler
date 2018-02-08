@@ -131,18 +131,18 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state,"pop\nld.reg %%rr\n");
 }
 
-void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
+void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_already_on_stack) {
     assert(0 == strcmp("methodCall|>", ast->tag));
 
     append_debug_setcontext(state, ast);
 
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: a method call is not a valid lvalue\n", state->filename, ast->state.row+1,
-                ast->state.col + 1);
+                ast->state.col);
         exit(EXIT_FAILURE);
     }
 
-    append_output(state, "dup\n");
+    if (!this_already_on_stack) append_output(state, "dup\n");
     append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 
     mpc_ast_t* funCall = ast->children[1];
@@ -186,7 +186,17 @@ void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
 
     if (ast->children_num == 1) state->exp_state->is_last_member = 1;
 
-    generate_prec19(state, ast->children[0]);
+    int is_super = 0;
+
+    if (strcmp("super", ast->children[0]->contents) == 0) {
+        append_output(state,"ld.local 0\n");
+        append_output(state,"ld.local 0\n");
+        append_output(state,"map.getprototype\n");
+        append_output(state,"map.getprototype\n");
+        is_super = 1;
+    } else {
+        generate_prec19(state, ast->children[0]);
+    }
 
     if (state->exp_state->is_first_member) state->exp_state->is_first_member = 0;
 
@@ -200,7 +210,7 @@ void generate_prec18(generator_state_t *state, mpc_ast_t *ast) {
         } else if (tag_startswith(ast->children[i], "prec18")) {
             generate_prec18(state, ast->children[i]);
         } else if (tag_startswith(ast->children[i], "methodCall")) {
-            generate_methodCall(state, ast->children[i]);
+            generate_methodCall(state, ast->children[i], is_super);
         }
     }
 }

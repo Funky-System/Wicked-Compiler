@@ -60,7 +60,7 @@ void generate_decl(generator_state_t *state, mpc_ast_t *ast);
 void generate_if(generator_state_t *state, mpc_ast_t *ast);
 void generate_ident(generator_state_t *state, mpc_ast_t *ast);
 void generate_funCall(generator_state_t *state, mpc_ast_t *ast);
-void generate_methodCall(generator_state_t *state, mpc_ast_t *ast);
+void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_already_on_stack);
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast);
 void generate_do(generator_state_t* state, mpc_ast_t *ast);
