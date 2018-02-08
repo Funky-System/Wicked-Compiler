@@ -22,6 +22,7 @@ typedef struct {
 
 typedef struct {
     const char *filename;
+    int debug;
     char *output;
     struct hashmap symbol_table;
     char scope[2048];
@@ -60,7 +61,6 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast);
 void generate_ident(generator_state_t *state, mpc_ast_t *ast);
 void generate_funCall(generator_state_t *state, mpc_ast_t *ast);
 void generate_methodCall(generator_state_t *state, mpc_ast_t *ast);
-void generate_methodFunCall(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast);
 void generate_do(generator_state_t* state, mpc_ast_t *ast);
@@ -74,7 +74,10 @@ void reserve_globals(generator_state_t *state, mpc_ast_t *ast, int depth, int *n
 void generate_class(generator_state_t *state, mpc_ast_t *ast);
 void generate_new(generator_state_t *state, mpc_ast_t *ast);
 
-char *generate(const char* filename, mpc_ast_t *ast);
+char *generate(const char* filename, int debug, mpc_ast_t *ast);
 void append_output(generator_state_t *state, const char *format, ...);
+void append_debug_setcontext(generator_state_t *state, mpc_ast_t *ast);
+void append_debug_enterscope(generator_state_t *state, const char* prefix, const char* name);
+void append_debug_leavescope(generator_state_t *state);
 
 #endif //COMPILER_GENERATOR_H

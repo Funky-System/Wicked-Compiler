@@ -5,6 +5,8 @@
 #define tag_startswith(ast, tagstr) (str_startswith(ast->tag, tagstr))
 
 void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
+    append_debug_setcontext(state, ast);
+
     if (strcmp(ast->contents, "this") == 0) {
         append_output(state,"ld.local 0\n");
         return;
@@ -99,6 +101,8 @@ void generate_prec20(generator_state_t *state, mpc_ast_t *ast) {
 void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("funCall|>", ast->tag));
 
+    append_debug_setcontext(state, ast);
+
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: a function call is not a valid lvalue\n", state->filename, ast->state.row+1,
                 ast->state.col + 1);
@@ -129,6 +133,8 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
 
 void generate_methodCall(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("methodCall|>", ast->tag));
+
+    append_debug_setcontext(state, ast);
 
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: a method call is not a valid lvalue\n", state->filename, ast->state.row+1,

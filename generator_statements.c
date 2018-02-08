@@ -4,6 +4,8 @@
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("stmt|>", ast->tag));
 
+    append_debug_setcontext(state, ast);
+
     if (strcmp("return", ast->children[0]->contents) == 0) {
         if (ast->children_num > 1 && strcmp("exp|>", ast->children[1]->tag) == 0) {
             generate_exp(state, ast->children[1]);
@@ -11,6 +13,7 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
         }
         append_output(state,"locals.cleanup\n");
         append_output(state,"args.cleanup\n");
+        append_debug_leavescope(state);
         append_output(state,"ret\n");
     } else if (strcmp(ast->children[0]->tag, "asm|>") == 0) {
         char code[strlen(ast->children[0]->children[1]->contents) + 1];

@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
             {"do-not-assemble", 'A', OPTPARSE_NONE},
             {"assembler", '.', OPTPARSE_REQUIRED},
             {"keep-asm", 'K', OPTPARSE_NONE},
+            {"debug", 'd', OPTPARSE_OPTIONAL},
             {0}
     };
 
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
     int assemble = 1;
     char *assembler = "funky-as";
     int keep_asm = 0;
+    int debug = 1;
 
     optparse_init(&options, argv);
     while ((option = optparse_long(&options, longopts, NULL)) != -1) {
@@ -65,6 +67,9 @@ int main(int argc, char **argv) {
             case '.': // assembler:
                 assembler = options.optarg;
                 break;
+            case 'd': // debug
+                debug = options.optarg ? (int)strtol(options.optarg, NULL, 0) : 1;
+                break;
             case '?':
             default:
                 fprintf(stderr, "%s: %s\n", argv[0], options.errmsg);
@@ -84,9 +89,9 @@ int main(int argc, char **argv) {
         }
 
         if (!assemble) {
-            compile_file_to_file(filename, output);
+            compile_file_to_file(filename, output, debug);
         } else  {
-            if (compile_file_to_file(filename, asm_output)) {
+            if (compile_file_to_file(filename, asm_output, debug)) {
                 char *command = malloc(strlen(assembler) + strlen(asm_output) + strlen(output) + 16);
                 strcpy(command, assembler);
                 strcat(command, " \"");

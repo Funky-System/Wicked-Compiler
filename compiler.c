@@ -33,7 +33,7 @@ void mpc_unfold(mpc_ast_t *ast) {
     }
 }
 
-int compile_file_to_file(const char *filename_in, const char* filename_out) {
+int compile_file_to_file(const char *filename_in, const char* filename_out, int debug) {
     mpc_err_t *err = generate_parser_grammar();
 
     if (err != NULL) {
@@ -46,7 +46,7 @@ int compile_file_to_file(const char *filename_in, const char* filename_out) {
         mpc_result_t r;
         if (mpc_parse_contents(filename_in, parser_wicked, &r)) {
             mpc_unfold(r.output);
-            char *output = generate(filename_in, (mpc_ast_t*)r.output);
+            char *output = generate(filename_in, debug, (mpc_ast_t*)r.output);
 
             FILE *fp = fopen(filename_out, "wb");
 
@@ -74,7 +74,7 @@ int compile_file_to_file(const char *filename_in, const char* filename_out) {
     return 1;
 }
 
-char* compile_string_to_string(const char *filename_hint, const char *input) {
+char* compile_string_to_string(const char *filename_hint, const char *input, int debug) {
     mpc_err_t *err = generate_parser_grammar();
 
     if (err != NULL) {
@@ -87,7 +87,7 @@ char* compile_string_to_string(const char *filename_hint, const char *input) {
     mpc_result_t r;
     if (mpc_parse(filename_hint, input, parser_wicked, &r)) {
         mpc_unfold(r.output);
-        char *output = generate(filename_hint, (mpc_ast_t*)r.output);
+        char *output = generate(filename_hint, debug, (mpc_ast_t*)r.output);
         mpc_ast_delete(r.output);
         return output;
     } else {
