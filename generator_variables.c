@@ -142,9 +142,9 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
             e->type = SYMBOL_TYPE_CLASS;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
 
-            append_output(state, "@proto_%s: var\n", ident);
+            append_output(state, "%s: var\n", ident);
             append_output(state, "section .text\n");
-            append_output(state, "ld.map\nst.addr @proto_%s\n", ident);
+            append_output(state, "ld.map\nst.addr %s\n", ident);
             append_output(state, "section .data\n");
 
         } else {
