@@ -64,6 +64,8 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     for (int i = 1; i < (ast->children_num - 1); i++) {
         mpc_ast_t *part = ast->children[i];
 
+        if (strcmp("imports|>", part->tag) == 0) generate_imports(&state, part);
+        if (strcmp("exports|>", part->tag) == 0) generate_exports(&state, part);
         if (strcmp("function|>", part->tag) == 0) generate_function(&state, part, "");
         if (strcmp("class|>", part->tag) == 0) generate_class(&state, part);
         if (strcmp("stmt|>", part->tag) == 0) generate_stmt(&state, part);

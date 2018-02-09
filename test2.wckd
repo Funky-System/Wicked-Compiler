@@ -16,6 +16,6 @@ var r = fib(40);
 
 
 asm "
-    ld.deref global_0
+    ld.deref @global_0
     #trap 3
 "

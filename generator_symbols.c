@@ -60,6 +60,16 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
                         ast->state.row + 1,
                         ast->state.col, ast->contents);
                 exit(EXIT_FAILURE);
+            } else if (entry->type == SYMBOL_TYPE_CLASS) {
+                fprintf(stderr, "%s:%ld:%ld error: '%s' is a class, not an lvalue\n", state->filename,
+                        ast->state.row + 1,
+                        ast->state.col, ast->contents);
+                exit(EXIT_FAILURE);
+            } else if (entry->type == SYMBOL_TYPE_MODULE) {
+                fprintf(stderr, "%s:%ld:%ld error: '%s' is a module, not an lvalue\n", state->filename,
+                        ast->state.row + 1,
+                        ast->state.col, ast->contents);
+                exit(EXIT_FAILURE);
             } else if (entry->type == SYMBOL_TYPE_FIELD) {
                 append_output(state, "ld.local 0\nst.mapitem \"%s\"\n", entry->name);
             }
@@ -82,6 +92,8 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
                 append_output(state, "ld.ref %s\n", entry->name);
             } else if (entry->type == SYMBOL_TYPE_CLASS) {
+                append_output(state, "ld.deref %s\n", entry->name);
+            } else if (entry->type == SYMBOL_TYPE_MODULE) {
                 append_output(state, "ld.deref %s\n", entry->name);
             } else if (entry->type == SYMBOL_TYPE_FIELD) {
                 append_output(state, "ld.local 0\nld.mapitem \"%s\"\n", entry->name);

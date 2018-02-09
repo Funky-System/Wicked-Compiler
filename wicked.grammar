@@ -104,7 +104,7 @@ classDecl  : ( <function> | <classVar> ) ;
 extends    : "extends" <ident> ('.' <ident>)* ;
 class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 
-import     : "import" <ident> ("as" (<ident> | "*") )? <eos> ;
+import     : "import" <ident> ("as" <ident>)? <eos> ;
 imports    : (<import> | <comment> | <eos>)* ;
 
 exportItem : <ident> ("as" (<ident>) )? ;

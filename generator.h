@@ -37,7 +37,8 @@ enum symbol_type {
     SYMBOL_TYPE_PARAM,
     SYMBOL_TYPE_FUNCTION,
     SYMBOL_TYPE_CLASS,
-    SYMBOL_TYPE_FIELD
+    SYMBOL_TYPE_FIELD,
+    SYMBOL_TYPE_MODULE
 };
 
 struct symbol_table_entry {
@@ -61,6 +62,9 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast);
 void generate_ident(generator_state_t *state, mpc_ast_t *ast);
 void generate_funCall(generator_state_t *state, mpc_ast_t *ast);
 void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_already_on_stack);
+
+void generate_imports(generator_state_t *state, mpc_ast_t *ast);
+void generate_exports(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast);
 void generate_do(generator_state_t* state, mpc_ast_t *ast);
