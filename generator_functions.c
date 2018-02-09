@@ -1,6 +1,8 @@
 #include <assert.h>
 #include "generator.h"
 
+void generate_default_params(generator_state_t *state, mpc_ast_t *ast);
+
 void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* prefix) {
     assert(0 == strcmp("function|>", ast->tag));
 
@@ -25,7 +27,12 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     if (state->is_method_definition) {
         append_output(state, "ld.reg %%r1\n");
         append_output(state, "st.local 0\n");
+    } else {
+        append_output(state, "ld.empty\n");
+        append_output(state, "st.local 0\n");
     }
+
+    generate_default_params(state, ast->children[3]);
 
     int index = mpc_ast_get_index(ast, "stmt|>");
     if (index == -1) index = ast->children_num - 2;
@@ -44,4 +51,26 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
 
     append_output(state, "\n");
     leave_scope(state);
+}
+
+void generate_default_params(generator_state_t *state, mpc_ast_t *ast) {
+    assert(strcmp(ast->tag, "args|>") == 0);
+
+    for (int i = 0, argnum = 0; i < ast->children_num; i++) {
+        if (strcmp(ast->children[i]->tag, "arg|>") == 0) {
+            mpc_ast_t *arg = ast->children[i];
+            if (arg->children_num > 1 && strcmp(arg->children[1]->contents, "=") == 0) {
+                // this arg has a default value
+                int skipId = state->uniqueid++;
+                append_output(state, "# default argument value for %d\n", argnum);
+                append_output(state, "ld.arg %d\n", argnum);
+                append_output(state, "is.empty\n");
+                append_output(state, "brfalse @skip_%d\n", skipId);
+                generate_exp(state, arg->children[2]);
+                append_output(state, "st.arg %d\n", argnum);
+                append_output(state, "@skip_%d:\npop\n", skipId);
+            }
+            argnum++;
+        }
+    }
 }

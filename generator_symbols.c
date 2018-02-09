@@ -50,7 +50,7 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
         if (entry == NULL) {
             fprintf(stderr, "%s:%ld:%ld error: global '%s' is not defined\n", state->filename,
                     identtag->state.row + 1,
-                    identtag->state.col + 1, scoped_ident + 7);
+                    identtag->state.col, scoped_ident + 7);
             exit(EXIT_FAILURE);
         }
         return entry;
@@ -74,7 +74,7 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
             if (entry == NULL) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is not defined\n", state->filename,
                         identtag->children[0]->state.row + 1,
-                        identtag->children[0]->state.col + 1, scoped_ident);
+                        identtag->children[0]->state.col, scoped_ident);
                 exit(EXIT_FAILURE);
             }
         } else {

@@ -93,8 +93,10 @@ stmt      : "do" <doBlock> ("while" <exp> <eos>)?
           | <comment>
           ;
 
-
-args       : <ident>? (',' <ident>)* ;
+arg        : <ident> '=' <exp>
+           | <ident>
+           ;
+args       : <arg>? (',' <arg>)* ;
 function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eos> ;
 
 classVar   : "var" <decl> ( ',' <decl> )* <eos> ;
