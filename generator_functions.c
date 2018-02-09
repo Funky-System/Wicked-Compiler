@@ -32,7 +32,9 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
         append_output(state, "st.local 0\n");
     }
 
-    generate_default_params(state, ast->children[3]);
+    if (num_params > 0) {
+        generate_default_params(state, ast->children[3]);
+    }
 
     int index = mpc_ast_get_index(ast, "stmt|>");
     if (index == -1) index = ast->children_num - 2;

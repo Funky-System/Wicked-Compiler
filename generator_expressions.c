@@ -4,64 +4,6 @@
 
 #define tag_startswith(ast, tagstr) (str_startswith(ast->tag, tagstr))
 
-void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
-    append_debug_setcontext(state, ast);
-
-    if (strcmp(ast->contents, "this") == 0) {
-        append_output(state,"ld.local 0\n");
-        return;
-    }
-
-    if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
-        // this is an assignment to an ident
-        if (state->exp_state->is_first_member) {
-            // assignment to single ident
-            struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
-
-            if (entry->type == SYMBOL_TYPE_LOCAL) {
-                append_output(state, "st.local %d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-                append_output(state, "st.addr @global_%d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_PARAM) {
-                append_output(state, "st.arg %d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
-                fprintf(stderr, "%s:%ld:%ld error: '%s' is a function, not an lvalue\n", state->filename,
-                        ast->state.row + 1,
-                        ast->state.col, ast->contents);
-                exit(EXIT_FAILURE);
-            } else if (entry->type == SYMBOL_TYPE_FIELD) {
-                append_output(state, "ld.local 0\nst.mapitem \"%s\"\n", entry->name);
-            }
-        } else {
-            // assignment to member ident
-            append_output(state, "st.mapitem \"%s\"\n", ast->contents);
-        }
-    } else {
-        // this is a value accessor
-        if (state->exp_state == NULL || state->exp_state->is_first_member) {
-            // first or single member
-            struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
-
-            if (entry->type == SYMBOL_TYPE_LOCAL) {
-                append_output(state, "ld.local %d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-                append_output(state, "ld.deref @global_%d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_PARAM) {
-                append_output(state, "ld.arg %d\n", entry->index);
-            } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
-                append_output(state, "ld.ref %s\n", entry->name);
-            } else if (entry->type == SYMBOL_TYPE_CLASS) {
-                append_output(state, "ld.ref %s\n", entry->name);
-            } else if (entry->type == SYMBOL_TYPE_FIELD) {
-                append_output(state, "ld.local 0\nld.mapitem \"%s\"\n", entry->name);
-            }
-        } else {
-            // this is not the first or single member
-            append_output(state, "ld.mapitem \"%s\"\n", ast->contents);
-        }
-    }
-}
-
 void generate_factor(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("factor|>", ast->tag));
 
