@@ -55,7 +55,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                                 ast->children[0]->state.row + 1,
-                                ast->children[0]->state.col + 1, ident);
+                                ast->children[0]->state.col, ident);
                         exit(EXIT_FAILURE);
                     }
                 }
@@ -83,21 +83,21 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                         ast->children[0]->state.row + 1,
-                        ast->children[0]->state.col + 1, ast->children[0]->contents);
+                        ast->children[0]->state.col, ast->children[0]->contents);
                 exit(EXIT_FAILURE);
             }
         }
     } else if (strcmp("args|>", ast->tag) == 0) {
         *num_params = 0;
         for (int i = 0; i < ast->children_num; i++) {
-            if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+            if (strcmp(ast->children[i]->tag, "arg|>") == 0) {
                 (*num_params)++;
             }
         }
         int cur_param = 0;
         for (int i = 0; i < ast->children_num; i++) {
-            if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
-                char *ident = ast->children[i]->contents;
+            if (strcmp(ast->children[i]->tag, "arg|>") == 0) {
+                char *ident = ast->children[i]->children[0]->contents;
                 char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + 2);
                 strcpy(scoped_ident, state->scope);
                 strcat(scoped_ident, ".");
@@ -111,8 +111,8 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                     cur_param++;
                 } else {
                     fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
-                            ast->children[i]->state.row + 1,
-                            ast->children[i]->state.col + 1, ast->children[i]->contents);
+                            ast->children[i]->children[0]->state.row + 1,
+                            ast->children[i]->children[0]->state.col, ast->children[i]->children[0]->contents);
                     exit(EXIT_FAILURE);
                 }
             }
@@ -129,7 +129,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                     ast->children[0]->state.row + 1,
-                    ast->children[0]->state.col + 1, ident);
+                    ast->children[0]->state.col, ident);
             exit(EXIT_FAILURE);
         }
     } else if (type == SYMBOL_TYPE_GLOBAL && strcmp("class|>", ast->tag) == 0) {
@@ -150,7 +150,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                     ast->children[0]->state.row + 1,
-                    ast->children[0]->state.col + 1, ast->children[0]->contents);
+                    ast->children[0]->state.col, ast->children[0]->contents);
             exit(EXIT_FAILURE);
         }
     }

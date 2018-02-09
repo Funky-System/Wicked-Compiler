@@ -27,7 +27,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is a function, not an lvalue\n", state->filename,
                         ast->state.row + 1,
-                        ast->state.col + 1, ast->contents);
+                        ast->state.col, ast->contents);
                 exit(EXIT_FAILURE);
             } else if (entry->type == SYMBOL_TYPE_FIELD) {
                 append_output(state, "ld.local 0\nst.mapitem \"%s\"\n", entry->name);
@@ -105,7 +105,7 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
 
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: a function call is not a valid lvalue\n", state->filename, ast->state.row+1,
-                ast->state.col + 1);
+                ast->state.col);
         exit(EXIT_FAILURE);
     }
 
@@ -231,7 +231,7 @@ void generate_prec17(generator_state_t *state, mpc_ast_t *ast) {
             // TODO
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -249,7 +249,7 @@ void generate_prec16(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"not\n");
         } else if (strcmp(oper, "+") == 0) {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is not implemented yet\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
             // TODO
         } else if (strcmp(oper, "-") == 0) {
@@ -262,7 +262,7 @@ void generate_prec16(generator_state_t *state, mpc_ast_t *ast) {
             // TODO
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -279,7 +279,7 @@ void generate_prec15(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"pow\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -300,7 +300,7 @@ void generate_prec14(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"mod\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -319,7 +319,7 @@ void generate_prec13(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"sub\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -338,7 +338,7 @@ void generate_prec12(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"rsh\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -361,7 +361,7 @@ void generate_prec11(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ge\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -384,7 +384,7 @@ void generate_prec10(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ne\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -401,7 +401,7 @@ void generate_prec09(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"and\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -418,7 +418,7 @@ void generate_prec08(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"or\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -435,7 +435,7 @@ void generate_prec07(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"or\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
-                    ast->children[i]->state.col + 1, ast->children[i]->contents);
+                    ast->children[i]->state.col, ast->children[i]->contents);
             exit(EXIT_FAILURE);
         }
     }
@@ -456,7 +456,7 @@ void generate_prec06(generator_state_t *state, mpc_ast_t *ast) {
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename,
                         ast->children[i]->state.row + 1,
-                        ast->children[i]->state.col + 1, ast->children[i]->contents);
+                        ast->children[i]->state.col, ast->children[i]->contents);
                 exit(EXIT_FAILURE);
             }
         }
@@ -480,7 +480,7 @@ void generate_prec05(generator_state_t *state, mpc_ast_t *ast) {
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename,
                         ast->children[i]->state.row + 1,
-                        ast->children[i]->state.col + 1, ast->children[i]->contents);
+                        ast->children[i]->state.col, ast->children[i]->contents);
                 exit(EXIT_FAILURE);
             }
         }
