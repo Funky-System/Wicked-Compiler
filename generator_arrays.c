@@ -27,7 +27,7 @@ void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state, "dup\narr.len\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: unexpected array indexer\n", state->filename,
-                    ast->children[1]->state.row + 1, ast->children[1]->state.col + 1);
+                    ast->children[1]->state.row + 1, ast->children[1]->state.col);
             exit(EXIT_FAILURE);
         }
 
@@ -46,11 +46,11 @@ void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast) {
             // this is an array dereference to something that does not exist yet
             //printf("dup\narr.len\n");
             fprintf(stderr, "%s:%ld:%ld error: empty array index\n", state->filename, ast->children[1]->state.row + 1,
-                    ast->children[1]->state.col + 1);
+                    ast->children[1]->state.col);
             exit(EXIT_FAILURE);
         } else {
             fprintf(stderr, "%s:%ld:%ld error: unexpected array indexer\n", state->filename,
-                    ast->children[1]->state.row + 1, ast->children[1]->state.col + 1);
+                    ast->children[1]->state.row + 1, ast->children[1]->state.col);
             exit(EXIT_FAILURE);
         }
 

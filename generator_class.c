@@ -133,7 +133,7 @@ void generate_new(generator_state_t *state, mpc_ast_t *ast) {
 
     if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         fprintf(stderr, "%s:%ld:%ld error: new operator can't be an lvalue\n", state->filename,
-                ast->children[0]->state.row + 1, ast->children[0]->state.col + 1);
+                ast->children[0]->state.row + 1, ast->children[0]->state.col);
         exit(EXIT_FAILURE);
     }
 
