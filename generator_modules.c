@@ -18,8 +18,9 @@ void generate_imports(generator_state_t *state, mpc_ast_t *ast) {
                 e->type = SYMBOL_TYPE_MODULE;
                 symbol_table_hashmap_put(&state->symbol_table, as, e);
                 append_output(state,"section .data\n%s: var\nsection .text\n", name);
-                append_output(state, "link \"%s\"\n", var);
-                append_output(state, "st.addr %s\n", name);
+                append_output(state, "link \"%s\"\ndup\n", var);
+                append_output(state, "st.ref %s\n", name);
+                append_output(state, "ld.mapitem \"@init\"\ncall.pop 0\n");
                 // TODO: name is never freed
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
@@ -40,12 +41,21 @@ void generate_exports(generator_state_t *state, mpc_ast_t *ast) {
                 if (strcmp(export->children[j]->tag, "exportItem|>") == 0) {
                     mpc_ast_t *exportItem = export->children[j];
                     const char *var = exportItem->children[0]->contents;
-                    get_symbol_from_ident(state, var); // to force namechecking
+                    struct symbol_table_entry *entry = get_symbol_from_ident(state, var);
                     const char *as = var;
                     if (exportItem->children_num > 1) {
                         as = exportItem->children[2]->contents;
                     }
-                    append_output(state, "export.as %s, \"%s\"\n", var, as);
+                    if (entry->type == SYMBOL_TYPE_GLOBAL || entry->type == SYMBOL_TYPE_FUNCTION) {
+                        append_output(state, "export.as %s, \"%s\"\n", var, as);
+                    } else if (entry->type == SYMBOL_TYPE_CLASS) {
+                        append_output(state, "export.as %s@val, \"%s\"\n", var, as);
+                    } else {
+                        fprintf(stderr, "%s:%ld:%ld error: '%s' is not exportable\n", state->filename,
+                                exportItem->state.row + 1,
+                                exportItem->state.col, as);
+                        exit(EXIT_FAILURE);
+                    }
                 }
             }
         }

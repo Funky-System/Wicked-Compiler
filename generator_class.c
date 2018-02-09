@@ -13,10 +13,8 @@ void generate_extends(generator_state_t *state, mpc_ast_t *ast, const char* clas
         }
     }
 
-    //append_output(state, "call.pop 0\n");
-    //append_output(state, "ld.reg %%rr\n");
-    //append_output(state, "map.getprototype\n");
-    append_output(state, "ld.deref %s\n", class_name);
+    append_output(state, "deref\n");
+    append_output(state, "ld.deref %s\nderef\n", class_name);
     append_output(state, "map.setprototype\n");
 }
 
@@ -42,7 +40,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
             if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
                 const char *funcName = classDecl->children[0]->children[1]->contents;
                 append_output(state, "# function: %s\n", classDecl->children[0]->children[1]->contents);
-                append_output(state, "ld.ref %s.%s\nld.deref %s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
+                append_output(state, "ld.ref %s.%s\nld.deref %s\nderef\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
             }
             if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
                 mpc_ast_t *classVar = classDecl->children[0];
@@ -54,10 +52,10 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                         if (classVar->children[j]->children_num > 1) {
                             // this decl has a def value
                             generate_exp(state, classVar->children[j]->children[2]);
-                            append_output(state, "ld.deref %s\n", name);
+                            append_output(state, "ld.deref %s\nderef\n", name);
                             append_output(state, "st.mapitem \"%s\"\n", varName);
                         } else {
-                            append_output(state, "ld.deref %s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
+                            append_output(state, "ld.deref %s\nderef\nld.empty\nst.mapitem \"%s\"\n", name, varName);
                         }
                         append_output(state, "\n");
                     }
@@ -85,7 +83,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "@alloc_%s:\n", name);
     append_debug_enterscope(state, "@alloc_", name);
     append_output(state, "ld.map\n");
-    append_output(state, "ld.deref %s\n", name);
+    append_output(state, "ld.deref %s\nderef\n", name);
     append_output(state, "ld.stack -1\n");
     append_output(state, "map.setprototype\n");
     append_output(state, "ld.uint 1\n");
@@ -96,7 +94,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "ret\n");
     append_output(state, "@%s__end:\n", name);
     append_output(state, "ld.ref @alloc_%s\n", name);
-    append_output(state, "ld.deref %s\n", name);
+    append_output(state, "ld.deref %s\nderef\n", name);
     append_output(state, "st.mapitem \"@alloc\"\n");
 
     append_output(state, "\n\n");
@@ -144,13 +142,14 @@ void generate_new(generator_state_t *state, mpc_ast_t *ast) {
     int i;
     for (i = 2; i < ast->children_num; i++) {
         if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
-            append_output(state, "ld.mapitem \"%s\"\n", ast->contents);
+            append_output(state, "ld.mapitem \"%s\"\n", ast->children[i]->contents);
         } else if (strcmp(ast->children[i]->tag, "funCall|>") == 0) {
             break;
         }
     }
 
     // call allocator
+    append_output(state,"deref\n");
     append_output(state,"ld.mapitem \"@alloc\"\n");
     append_output(state,"call.pop 0\n");
     append_output(state,"ld.reg %%rr\n");

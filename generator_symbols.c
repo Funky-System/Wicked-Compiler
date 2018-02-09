@@ -52,7 +52,7 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             if (entry->type == SYMBOL_TYPE_LOCAL) {
                 append_output(state, "st.local %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-                append_output(state, "st.addr @global_%d\n", entry->index);
+                append_output(state, "st.ref @global_%d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_PARAM) {
                 append_output(state, "st.arg %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {

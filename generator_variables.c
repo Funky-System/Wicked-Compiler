@@ -13,7 +13,7 @@ void generate_decl(generator_state_t *state, mpc_ast_t *ast) {
         if (entry->type == SYMBOL_TYPE_LOCAL) {
             append_output(state,"st.local %d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
-            append_output(state,"st.addr @global_%d\n", entry->index);
+            append_output(state,"st.ref @global_%d\n", entry->index);
         } else if (entry->type == SYMBOL_TYPE_PARAM) {
             append_output(state,"st.arg %d\n", entry->index);
         }
@@ -142,9 +142,11 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
             e->type = SYMBOL_TYPE_CLASS;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
 
+            append_output(state, "%s@val: var\n", ident);
             append_output(state, "%s: var\n", ident);
             append_output(state, "section .text\n");
-            append_output(state, "ld.map\nst.addr %s\n", ident);
+            append_output(state, "ld.map\nst.ref %s@val\n", ident);
+            append_output(state, "ld.ref %s@val\nst.ref %s\n", ident, ident);
             append_output(state, "section .data\n");
 
         } else {
