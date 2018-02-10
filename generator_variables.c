@@ -155,6 +155,27 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                     ast->children[0]->state.col, ast->children[0]->contents);
             exit(EXIT_FAILURE);
         }
+    } else if (type == SYMBOL_TYPE_GLOBAL && strcmp("enum|>", ast->tag) == 0) {
+        char *ident = ast->children[1]->contents;
+        if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
+
+            struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
+            e->name = ast->children[1]->contents;
+            e->index = 0;
+            e->type = SYMBOL_TYPE_ENUM;
+            symbol_table_hashmap_put(&state->symbol_table, ident, e);
+
+            append_output(state, "%s: var\n", ident);
+            append_output(state, "section .text\n");
+            append_output(state, "ld.map\nst.ref %s\n", ident);
+            append_output(state, "section .data\n");
+
+        } else {
+            fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
+                    ast->children[0]->state.row + 1,
+                    ast->children[0]->state.col, ast->children[0]->contents);
+            exit(EXIT_FAILURE);
+        }
     }
 
     if (type == SYMBOL_TYPE_GLOBAL && strcmp(ast->tag, "function|>") == 0) {

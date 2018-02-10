@@ -105,8 +105,12 @@ classDecl  : ( <function> | <classVar> ) ;
 extends    : "extends" <ident> ('.' <ident>)* ;
 class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 
+enumDecl   : <ident> ( '=' <int> )? ;
+enum       : "enum" <ident> <eos> <enumDecl>? (',' <eos>? <enumDecl> <eos>?)* "end" <eos> ;
+
 exportableFunction : "export"? <function> ;
 exportableClass    : "export"? <class> ;
+exportableEnum     : "export"? <enum> ;
 
 import     : "import" <ident> ("as" <ident>)? <eos> ;
 imports    : (<import> | <comment> | <eos>)* ;
@@ -115,4 +119,4 @@ exportItem : <ident> ("as" (<ident>) )? ;
 export     : "export" <exportItem> (',' <exportItem>)* <eos> ;
 exports    : (<export> | <comment> | <eos>)* ;
 
-wicked     : /^/ <imports> <exports> (<exportableFunction> | <exportableClass> | <stmt> | <eos>)* /$/;
+wicked     : /^/ <imports> <exports> (<exportableFunction> | <exportableClass> | <exportableEnum> | <stmt> | <eos>)* /$/;

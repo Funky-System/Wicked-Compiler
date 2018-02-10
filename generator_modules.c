@@ -52,6 +52,8 @@ void generate_exports(generator_state_t *state, mpc_ast_t *ast) {
                         append_output(state, "export.as %s, \"%s\"\n", var, as);
                     } else if (entry->type == SYMBOL_TYPE_CLASS) {
                         append_output(state, "export.as %s@val, \"%s\"\n", var, as);
+                    } else if (entry->type == SYMBOL_TYPE_ENUM) {
+                        append_output(state, "export.as %s, \"%s\"\n", var, as);
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is not exportable\n", state->filename,
                                 exportItem->state.row + 1,
@@ -70,6 +72,10 @@ const char* class_get_name(mpc_ast_t *ast) {
 }
 
 const char* function_get_name(mpc_ast_t *ast) {
+    return ast->children[1]->contents;
+}
+
+const char* enum_get_name(mpc_ast_t *ast) {
     return ast->children[1]->contents;
 }
 
@@ -94,5 +100,17 @@ void generate_exportable_function(generator_state_t *state, mpc_ast_t *ast) {
         generate_function(state, ast->children[1], "");
     } else {
         generate_function(state, ast->children[0], "");
+    }
+}
+
+void generate_exportable_enum(generator_state_t *state, mpc_ast_t *ast) {
+    if (strcmp(ast->children[0]->contents, "export") == 0) {
+        const char* name = enum_get_name(ast->children[1]);
+        append_output(state, "section .exports\n");
+        append_output(state, "export.as %s, \"%s\"\n", name, name);
+        append_output(state, "section .text\n");
+        generate_enum(state, ast->children[1]);
+    } else {
+        generate_enum(state, ast->children[0]);
     }
 }

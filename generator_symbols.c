@@ -46,6 +46,11 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
                         ast->state.row + 1,
                         ast->state.col, ast->contents);
                 exit(EXIT_FAILURE);
+            } else if (entry->type == SYMBOL_TYPE_ENUM) {
+                fprintf(stderr, "%s:%ld:%ld error: '%s' is an enum, not an lvalue\n", state->filename,
+                        ast->state.row + 1,
+                        ast->state.col, ast->contents);
+                exit(EXIT_FAILURE);
             } else if (entry->type == SYMBOL_TYPE_MODULE) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is a module, not an lvalue\n", state->filename,
                         ast->state.row + 1,
@@ -75,6 +80,8 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
                 append_output(state, "ld.ref %s\n", entry->name);
             } else if (entry->type == SYMBOL_TYPE_CLASS) {
+                append_output(state, "ld.deref %s\n", entry->name);
+            } else if (entry->type == SYMBOL_TYPE_ENUM) {
                 append_output(state, "ld.deref %s\n", entry->name);
             } else if (entry->type == SYMBOL_TYPE_MODULE) {
                 append_output(state, "ld.deref %s\n", entry->name);
@@ -157,7 +164,7 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
             if (entry == NULL) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is not defined\n", state->filename,
                         identtag->state.row + 1,
-                        identtag->state.col, scoped_ident);
+                        identtag->children[0]->state.col, scoped_ident);
                 exit(EXIT_FAILURE);
             }
         } else {

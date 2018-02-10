@@ -11,7 +11,7 @@ add_custom_command(
         DEPENDS wicked.grammar
 )
 
-add_library(wickedc mpc/mpc.c ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c generator.c generator.h hashmap.c generator_expressions.c generator_symbols.c generator_functions.c generator_statements.c generator_variables.c generator_if.c generator_while.c generator_arrays.c compiler.c compiler.h generator_class.c generator_modules.c)
+add_library(wickedc mpc/mpc.c ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c generator.c generator.h hashmap.c generator_expressions.c generator_symbols.c generator_functions.c generator_statements.c generator_variables.c generator_if.c generator_while.c generator_arrays.c compiler.c compiler.h generator_class.c generator_modules.c generator_enum.c)
 add_executable(wickedc-bin main.c)
 target_link_libraries(wickedc-bin wickedc)
 set_target_properties(wickedc-bin PROPERTIES OUTPUT_NAME wickedc)
