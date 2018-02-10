@@ -156,8 +156,8 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
             entry = symbol_table_hashmap_get(&state->symbol_table, scoped_ident);
             if (entry == NULL) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is not defined\n", state->filename,
-                        identtag->children[0]->state.row + 1,
-                        identtag->children[0]->state.col, scoped_ident);
+                        identtag->state.row + 1,
+                        identtag->state.col, scoped_ident);
                 exit(EXIT_FAILURE);
             }
         } else {
