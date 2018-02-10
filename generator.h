@@ -27,7 +27,6 @@ typedef struct {
     struct hashmap symbol_table;
     char scope[2048];
     int uniqueid;
-    int is_method_definition;
     exp_state_t *exp_state;
 } generator_state_t;
 

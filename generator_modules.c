@@ -46,7 +46,9 @@ void generate_exports(generator_state_t *state, mpc_ast_t *ast) {
                     if (exportItem->children_num > 1) {
                         as = exportItem->children[2]->contents;
                     }
-                    if (entry->type == SYMBOL_TYPE_GLOBAL || entry->type == SYMBOL_TYPE_FUNCTION) {
+                    if (entry->type == SYMBOL_TYPE_GLOBAL) {
+                        append_output(state, "export.as @global_%d, \"%s\"\n", entry->index, as);
+                    } else if (entry->type == SYMBOL_TYPE_FUNCTION) {
                         append_output(state, "export.as %s, \"%s\"\n", var, as);
                     } else if (entry->type == SYMBOL_TYPE_CLASS) {
                         append_output(state, "export.as %s@val, \"%s\"\n", var, as);

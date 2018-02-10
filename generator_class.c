@@ -68,12 +68,10 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
         if (strcmp("classDecl|>", ast->children[i]->tag) == 0) {
             mpc_ast_t *classDecl = ast->children[i];
             if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
-                state->is_method_definition = 1;
                 char prefix[128];
                 strcpy(prefix, name);
                 strcat(prefix, ".");
                 generate_function(state, classDecl->children[0], prefix);
-                state->is_method_definition = 0;
             }
         }
     }

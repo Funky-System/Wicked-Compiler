@@ -1,93 +1,20 @@
 #import module1 as bla
 #
 #var i, j = new bla.Person
-#i = j.a()
-#asm "
-#ld.deref @global_0
-#trap 1
-#pop
-#"
-#
+#i = bla.const
 
-class bar
-
-    var ba = 3
-
-    function aaa()
-        return "trrr"
-    end
-
+function a_test()
+    return this + 109
 end
 
-class mua extends bar
+array.test = a_test
 
-    var mua_var = 12345
+var i = [1,2,3]
+i.test()
 
-    var foo = 1009
-
-    function hoi(inc)
-       return "abc" + inc
-    end
-
-    function hoki()
-        return "as" + this.foo + super.aaa()
-    end
-
-end
-
-class bla extends mua
-
-    var i = 9
-
-    var foo = 4
-
-    function new(k)
-        #this.i = 2 * k
-        this.i = 2 * k
-        for i in 1..5 do
-            this.i += 1
-        end
-    end
-
-    function hoi(inc)
-        var i = 123
-        this.i += inc
-        this.i += this.hoki()
-        return this.i
-    end
-
-    function hoki()
-        return 4
-    end
-
-    function test()
-        return super.hoki()
-    end
-
-end
-
-function basic(i)
-    return 199 + i
-end
-
-var ctr = 100;
-var ki = 0
-
-#kj
-
-#while ki < 60*60*60 do
-#    var greet = new bla(8)
-#    var j = greet.mua_var
-#    j = greet.hoi(basic(3)) * ki
-#    ctr += ki
-#    ki += 1
-#end
-
-ctr = new bla(3).test()
-
-#j = basic(9)
 asm "
 ld.deref @global_0
 trap 1
 pop
 "
+

@@ -68,6 +68,7 @@ void generate_funCall(generator_state_t *state, mpc_ast_t *ast) {
 
     //append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 
+    append_output(state,"ld.empty\nst.reg %%r1\n", num_arguments); // the map
     append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
     append_output(state,"call.pop %d\n", num_arguments);
     append_output(state,"pop\nld.reg %%rr\n");
@@ -105,7 +106,7 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_alre
     }
 
     append_output(state,"ld.stack -%d\n", num_arguments + 1); // the map
-    append_output(state,"st.reg %%r1\n", num_arguments); // the map
+    append_output(state,"st.reg %%r1\n"); // the map
     append_output(state,"ld.stack -%d\n", num_arguments); // the address of the function
     append_output(state,"call.pop %d\n", num_arguments);
     append_output(state,"pop\n"); // pop the duplicated func address

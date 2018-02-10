@@ -24,13 +24,8 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     //print_symbol_table(state);
     append_output(state,"args.accept %d\n", num_params);
     append_output(state,"locals.res %d\n", num_locals);
-    if (state->is_method_definition) {
-        append_output(state, "ld.reg %%r1\n");
-        append_output(state, "st.local 0\n");
-    } else {
-        append_output(state, "ld.empty\n");
-        append_output(state, "st.local 0\n");
-    }
+    append_output(state, "ld.reg %%r1\n");
+    append_output(state, "st.local 0\n");
 
     if (num_params > 0) {
         generate_default_params(state, ast->children[3]);
