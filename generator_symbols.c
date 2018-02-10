@@ -58,6 +58,8 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             // assignment to single ident
             struct symbol_table_entry *entry = get_symbol_from_scopedIdent(state, ast);
 
+            append_output(state, "dup\n");
+
             if (entry->type == SYMBOL_TYPE_LOCAL) {
                 append_output(state, "st.local %d\n", entry->index);
             } else if (entry->type == SYMBOL_TYPE_GLOBAL) {
@@ -84,7 +86,9 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
             }
         } else {
             // assignment to member ident
+            append_output(state, "ld.stack -1\nst.reg %%r2\n");
             append_output(state, "st.mapitem \"%s\"\n", ast->contents);
+            append_output(state, "ld.reg %%r2\n");
         }
     } else {
         // this is a value accessor

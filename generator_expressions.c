@@ -505,14 +505,6 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
 
     if (ast->children_num > 1) {
         state->exp_state->is_lvalue--;
-//
-//        if (state->has_lvalue) {
-//            if (tag_startswith(ast->children[0], "prec04")) {
-//                generate_prec04(state, ast->children[0]);
-//            } else if (tag_startswith(ast->children[0], "ident")) {
-//                generate_ident(state, ast->children[0]);
-//            }
-//        }
     }
 }
 
