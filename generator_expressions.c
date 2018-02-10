@@ -19,7 +19,7 @@ void generate_factor(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ld.str %s\n", ast->children[0]->contents);
         } else if (strcmp(ast->children[0]->tag, "arrayInit|>") == 0) {
             generate_arrayInit(state, ast->children[0]);
-        }  else if (strcmp(ast->children[0]->tag, "new|>") == 0) {
+        } else if (strcmp(ast->children[0]->tag, "new|>") == 0) {
             generate_new(state, ast->children[0]);
         } else {
             assert(0);
@@ -27,6 +27,8 @@ void generate_factor(generator_state_t *state, mpc_ast_t *ast) {
     } else if (strcmp(ast->children[0]->contents, "(") == 0) {
         // parentheses
         generate_exp(state, ast->children[1]);
+    } else if (strcmp(ast->children[0]->contents, "prototypeof") == 0) {
+        generate_prototypeof(state, ast);
     }
 }
 
@@ -203,6 +205,37 @@ void generate_prec16(generator_state_t *state, mpc_ast_t *ast) {
             // TODO
         } else if (strcmp(oper, "typeof") == 0) {
             // TODO
+        } else if (strcmp(oper, "prototypeof") == 0) {
+            if (strcmp(ast->contents, "string") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_STRING\n");
+                return;
+            }
+
+            if (strcmp(ast->contents, "int") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_INT\n");
+                return;
+            }
+
+            if (strcmp(ast->contents, "uint") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_UINT\n");
+                return;
+            }
+
+            if (strcmp(ast->contents, "array") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_ARRAY\n");
+                return;
+            }
+
+            if (strcmp(ast->contents, "float") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_FLOAT\n");
+                return;
+            }
+
+            if (strcmp(ast->contents, "map") == 0) {
+                append_output(state,"ld.boxingproto VM_TYPE_MAP\n");
+                return;
+            }
+
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
                     ast->children[i]->state.col, ast->children[i]->contents);

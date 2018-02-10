@@ -72,6 +72,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                 strcpy(prefix, name);
                 strcat(prefix, ".");
                 generate_function(state, classDecl->children[0], prefix);
+
             }
         }
     }
@@ -98,7 +99,6 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     append_output(state, "\n\n");
 
     leave_scope(state);
-
 }
 
 void generate_newCall(generator_state_t *state, mpc_ast_t *ast) {
@@ -170,4 +170,55 @@ void generate_new(generator_state_t *state, mpc_ast_t *ast) {
         append_output(state,"call.pop 0\n");
     }
     append_output(state,"@skip_%d:\npop\n@end_%d:\n", skipId, skipId);
+}
+
+void generate_prototypeof(generator_state_t *state, mpc_ast_t *ast) {
+    if (state->exp_state->is_lvalue && state->exp_state->is_last_member) {
+        fprintf(stderr, "%s:%ld:%ld error: prototypeof can't be an lvalue\n", state->filename,
+                ast->children[0]->state.row + 1, ast->children[0]->state.col + 1);
+        exit(EXIT_FAILURE);
+    }
+
+    if (ast->children_num == 2) {
+        if (strcmp(ast->children[1]->contents, "string") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_STRING\n");
+            return;
+        }
+
+        if (strcmp(ast->children[1]->contents, "int") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_INT\n");
+            return;
+        }
+
+        if (strcmp(ast->children[1]->contents, "uint") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_UINT\n");
+            return;
+        }
+
+        if (strcmp(ast->children[1]->contents, "array") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_ARRAY\n");
+            return;
+        }
+
+        if (strcmp(ast->children[1]->contents, "float") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_FLOAT\n");
+            return;
+        }
+
+        if (strcmp(ast->children[1]->contents, "map") == 0) {
+            append_output(state, "ld.boxingproto VM_TYPE_MAP\n");
+            return;
+        }
+    }
+
+    generate_ident(state, ast->children[1]);
+
+    int i;
+    for (i = 2; i < ast->children_num; i++) {
+        if (strcmp(ast->children[i]->tag, "ident|>") == 0) {
+            append_output(state, "ld.mapitem \"%s\"\n", ast->children[i]->contents);
+        }
+    }
+
+    append_output(state,"deref\n");
 }

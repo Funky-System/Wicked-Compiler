@@ -20,6 +20,7 @@ factor    : '(' <exp> ')'
           | <stringlit>
           | <arrayInit>
           | <new>
+          | "prototypeof" <ident> ('.' <ident>)*
           ;
 
 prec20    : <factor> | <ident> ;
@@ -104,6 +105,9 @@ classDecl  : ( <function> | <classVar> ) ;
 extends    : "extends" <ident> ('.' <ident>)* ;
 class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 
+exportableFunction : "export"? <function> ;
+exportableClass    : "export"? <class> ;
+
 import     : "import" <ident> ("as" <ident>)? <eos> ;
 imports    : (<import> | <comment> | <eos>)* ;
 
@@ -111,4 +115,4 @@ exportItem : <ident> ("as" (<ident>) )? ;
 export     : "export" <exportItem> (',' <exportItem>)* <eos> ;
 exports    : (<export> | <comment> | <eos>)* ;
 
-wicked     : /^/ <imports> <exports> (<function> | <class> | <stmt> | <eos>)* /$/;
+wicked     : /^/ <imports> <exports> (<exportableFunction> | <exportableClass> | <stmt> | <eos>)* /$/;

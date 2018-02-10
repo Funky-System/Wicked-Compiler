@@ -22,36 +22,6 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         return;
     }
 
-    if (strcmp(ast->contents, "string") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_STRING\n");
-        return;
-    }
-
-    if (strcmp(ast->contents, "int") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_INT\n");
-        return;
-    }
-
-    if (strcmp(ast->contents, "uint") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_UINT\n");
-        return;
-    }
-
-    if (strcmp(ast->contents, "array") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_ARRAY\n");
-        return;
-    }
-
-    if (strcmp(ast->contents, "float") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_FLOAT\n");
-        return;
-    }
-
-    if (strcmp(ast->contents, "map") == 0) {
-        append_output(state,"ld.boxingproto VM_TYPE_MAP\n");
-        return;
-    }
-
     if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         // this is an assignment to an ident
         if (state->exp_state->is_first_member) {

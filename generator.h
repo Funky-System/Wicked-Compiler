@@ -64,6 +64,8 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_alre
 
 void generate_imports(generator_state_t *state, mpc_ast_t *ast);
 void generate_exports(generator_state_t *state, mpc_ast_t *ast);
+void generate_exportable_function(generator_state_t *state, mpc_ast_t *ast);
+void generate_exportable_class(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast);
 void generate_do(generator_state_t* state, mpc_ast_t *ast);
@@ -78,6 +80,7 @@ void print_symbol_table(generator_state_t *state);
 
 void generate_class(generator_state_t *state, mpc_ast_t *ast);
 void generate_new(generator_state_t *state, mpc_ast_t *ast);
+void generate_prototypeof(generator_state_t *state, mpc_ast_t *ast);
 
 char *generate(const char* filename, int debug, mpc_ast_t *ast);
 void append_output(generator_state_t *state, const char *format, ...);

@@ -66,8 +66,8 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
 
         if (strcmp("imports|>", part->tag) == 0) generate_imports(&state, part);
         if (strcmp("exports|>", part->tag) == 0) generate_exports(&state, part);
-        if (strcmp("function|>", part->tag) == 0) generate_function(&state, part, "");
-        if (strcmp("class|>", part->tag) == 0) generate_class(&state, part);
+        if (strcmp("exportableFunction|>", part->tag) == 0) generate_exportable_function(&state, part);
+        if (strcmp("exportableClass|>", part->tag) == 0) generate_exportable_class(&state, part);
         if (strcmp("stmt|>", part->tag) == 0) generate_stmt(&state, part);
     }
 
