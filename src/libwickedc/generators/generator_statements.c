@@ -95,8 +95,8 @@ void generate_block(generator_state_t *state, mpc_ast_t *ast, const char* contin
 void generate_continue(generator_state_t *state, mpc_ast_t *ast) {
     if (state->num_continue_labels == 0) return;
     int i = (int)state->num_continue_labels - 1;
-    const char* label = state->continue_labels[i];
-    while (label == NULL && i >= 0) {
+    char* label = state->continue_labels[i];
+    while (label == NULL && i > 0) {
         i--;
         label = state->continue_labels[i];
     }
@@ -109,7 +109,7 @@ void generate_break(generator_state_t *state, mpc_ast_t *ast) {
     if (state->num_break_labels == 0) return;
     int i = (int)state->num_break_labels - 1;
     char* label = state->break_labels[i];
-    while (label == NULL && i >= 0) {
+    while (label == NULL && i > 0) {
         i--;
         label = state->break_labels[i];
     }

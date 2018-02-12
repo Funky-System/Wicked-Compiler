@@ -24,6 +24,8 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast) {
     sprintf(endlabel, "@enddo_%d", state->uniqueid++);
     append_output(state,"%s:\n", startlabel);
 
+    enter_scope(state, "^", checklabel, endlabel);
+
     mpc_ast_t *doBlock = ast->children[1];
     for (int i = 0; i < doBlock->children_num; i++) {
         if (strcmp("stmt|>", doBlock->children[i]->tag) == 0) {
@@ -42,6 +44,8 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast) {
     } else {
         append_output(state,"%s:\n", endlabel);
     }
+
+    leave_scope(state);
 }
 
 void generate_for(generator_state_t *state, mpc_ast_t *ast) {
