@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "generator.h"
+#include "string_functions.h"
 
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("stmt|>", ast->tag));
@@ -19,7 +20,9 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
         char code[strlen(ast->children[0]->children[1]->contents) + 1];
         strcpy(code, ast->children[0]->children[1]->contents);
         code[strlen(code) - 1] = '\0';
-        append_output(state,"%s\n", code + 1);
+        char* verbatim = str_replace(code + 1, "\\\"", "\"");
+        append_output(state,"%s\n", verbatim);
+        free(verbatim);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "if") == 0) {
         generate_if(state, ast);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "while") == 0) {

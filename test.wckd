@@ -1,9 +1,16 @@
-import module1
+import io
 
-var i = module1.Person.b()
+class Person
+    var name = "nameless"
 
-asm "
-ld.deref @global_0
-trap 1
-pop
-"
+    function new(name)
+        this.name = name
+    end
+
+    function greet()
+        io.print("Hi " + this.name + "!\n")
+    end
+end
+
+var me = new Person("Bas")
+me.greet()
