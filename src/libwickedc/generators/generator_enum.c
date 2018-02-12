@@ -8,7 +8,7 @@ void generate_enum(generator_state_t *state, mpc_ast_t *ast) {
     char *name = ast->children[1]->contents;
     append_output(state, "# Enum name: %s\n", name);
 
-    enter_scope(state, name);
+    enter_scope(state, name, NULL, NULL);
 
     long it = 0;
 

@@ -148,6 +148,7 @@ struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const
     }
 
     free(scoped_ident);
+    free(scope);
 
     return entry;
 }
@@ -201,14 +202,42 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
     return entry;
 }
 
-void enter_scope(generator_state_t *state, const char* name) {
+void enter_scope(generator_state_t *state, const char* name, const char* continue_label, const char* break_label) {
     if (state->scope[0] != '\0') {
         strcat(state->scope, ".");
     }
     strcat(state->scope, name);
+
+    state->num_continue_labels++;
+    state->continue_labels = realloc(state->continue_labels, state->num_continue_labels * sizeof(char *));
+    if (continue_label != NULL) {
+        state->continue_labels[state->num_continue_labels - 1] = strdup(continue_label);
+    } else {
+        state->continue_labels[state->num_continue_labels - 1] = NULL;
+    }
+
+    state->num_break_labels++;
+    state->break_labels = realloc(state->break_labels, state->num_break_labels * sizeof(char *));
+    if (break_label != NULL) {
+        state->break_labels[state->num_break_labels - 1] = strdup(break_label);
+    } else {
+        state->break_labels[state->num_break_labels - 1] = NULL;
+    }
 }
 
 void leave_scope(generator_state_t *state) {
+    state->num_continue_labels--;
+    if (state->continue_labels[state->num_continue_labels] != NULL) {
+        free(state->continue_labels[state->num_continue_labels]);
+    }
+    state->continue_labels = realloc(state->continue_labels, state->num_continue_labels * sizeof(char*));
+
+    state->num_break_labels--;
+    if (state->break_labels[state->num_break_labels] != NULL) {
+        free(state->break_labels[state->num_break_labels]);
+    }
+    state->break_labels = realloc(state->break_labels, state->num_break_labels * sizeof(char*));
+
     char *pos = strrchr(state->scope, '.');
     if(pos == NULL) {
         if (strcmp(state->scope, "^") == 0) {
@@ -228,7 +257,7 @@ void leave_scope(generator_state_t *state) {
             struct symbol_table_entry *entry = symbol_table_hashmap_iter_get_data(iter);
             const char *key = symbol_table_hashmap_iter_get_key(iter);
             if (str_startswith(key, scope)) {
-                free((void *) key);
+                free(entry->name);
                 free(entry);
                 iter = hashmap_iter_remove(&state->symbol_table, iter);
             } else {

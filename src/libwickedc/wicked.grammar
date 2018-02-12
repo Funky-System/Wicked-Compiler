@@ -71,11 +71,11 @@ prec01stmt    : <prec02stmt> ( "<,>" <prec02>)* ;
 expstmt       : <prec01stmt> ;
 
 block     : <stmt>
-          | <eos> <stmt>* "end" ;
+          | <eos> (<stmt> | <eos>)* "end" ;
 doBlock   : <eos> <stmt>* ("end" | "loop")
           | <stmt> ("loop")
           ;
-ifBlock   : <eos> <stmt>* ("end" | "else" <block>)
+ifBlock   : <eos> (<stmt> | <eos>)* ("end" | "else" <block>)
           | <stmt> ("else" <block>)?
           ;
 
@@ -89,6 +89,8 @@ stmt      : "do" <doBlock> ("while" <exp> <eos>)?
           | "if" <exp> "then" <ifBlock>
           | "var" <decl> ( ',' <decl> )* <eos>
           | "return" <exp>? <eos>
+          | "continue" <eos>
+          | "break" <eos>
           | <asm> <eos>
           | <expstmt> <eos>
           | <comment>

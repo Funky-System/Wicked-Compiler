@@ -14,11 +14,12 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
     int elsefound = 0;
     append_output(state,"brfalse %s\n", elselabel);
 
-    enter_scope(state, "^");
+    enter_scope(state, "^", NULL, NULL);
 
     mpc_ast_t *ifBlock = ast->children[3];
     for (int i = 0; i < ifBlock->children_num; i++) {
         if (strcmp("stmt|>", ifBlock->children[i]->tag) == 0) {
+            // single line if statement
             generate_stmt(state, ifBlock->children[i]);
         } else if (strcmp("string", ifBlock->children[i]->tag) == 0 && strcmp("end", ifBlock->children[i]->contents) == 0) {
             if (!elsefound) {
@@ -30,11 +31,14 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"%s:\n", elselabel);
         } else if (strcmp("block|>", ifBlock->children[i]->tag) == 0) {
             leave_scope(state);
-            generate_block(state, ifBlock->children[i]);
-            enter_scope(state, "^");
+            generate_block(state, ifBlock->children[i], NULL, NULL);
+            enter_scope(state, "^", NULL, NULL);
         }
     }
 
+    if (!elsefound) {
+        append_output(state,"%s:\n", elselabel);
+    }
     append_output(state,"%s:\n", endlabel);
 
     leave_scope(state);

@@ -13,14 +13,15 @@ void generate_while(generator_state_t *state, mpc_ast_t *ast) {
     generate_exp(state, ast->children[1]);
     append_output(state,"brfalse %s\n", endlabel);
 
-    generate_block(state, ast->children[3]);
+    generate_block(state, ast->children[3], startlabel, endlabel);
     append_output(state,"jmp %s\n%s:\n", startlabel, endlabel);
 }
 
 void generate_do(generator_state_t* state, mpc_ast_t *ast) {
-    char startlabel[19], endlabel[19];
-    sprintf(startlabel, "startdo_%d", state->uniqueid);
-    sprintf(endlabel, "enddo_%d", state->uniqueid++);
+    char startlabel[19], endlabel[19], checklabel[19];
+    sprintf(startlabel, "@startdo_%d", state->uniqueid);
+    sprintf(checklabel, "@while_%d", state->uniqueid);
+    sprintf(endlabel, "@enddo_%d", state->uniqueid++);
     append_output(state,"%s:\n", startlabel);
 
     mpc_ast_t *doBlock = ast->children[1];
@@ -29,12 +30,13 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast) {
             generate_stmt(state, doBlock->children[i]);
         } else if (strcmp("block|>", doBlock->children[i]->tag) == 0) {
             leave_scope(state);
-            generate_block(state, doBlock->children[i]);
-            enter_scope(state, "^");
+            generate_block(state, doBlock->children[i], checklabel, endlabel);
+            enter_scope(state, "^", checklabel, endlabel);
         }
     }
 
     if (ast->children_num > 2) {
+        append_output(state, "%s:\n", checklabel);
         generate_exp(state, ast->children[3]);
         append_output(state,"brtrue %s\n", startlabel);
     } else {
@@ -49,8 +51,9 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("exp|>", ast->children[3]->tag));
     assert(0 == strcmp("block|>", ast->children[5]->tag));
 
-    char startlabel[19], endlabel[19];
+    char startlabel[19], endlabel[19], inclabel[19];
     sprintf(startlabel, "startfor_%d", state->uniqueid);
+    sprintf(inclabel, "continue_%d", state->uniqueid);
     sprintf(endlabel, "endfor_%d", state->uniqueid++);
 
     // init: i = 0
@@ -59,7 +62,7 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast) {
 
     append_output(state,"%s:\n", startlabel);
     append_output(state,"ld.stack 0\nld.stack -2\ncmp\nbge %s\n", endlabel);
-    enter_scope(state, "^");
+    enter_scope(state, "^", inclabel, endlabel);
     struct symbol_table_entry *i = get_symbol_from_ident(state, ast->children[1]->contents);
     leave_scope(state);
     append_output(state,"ld.stack -2\nld.stack -1\nld.arrelem\n");
@@ -69,9 +72,10 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast) {
         append_output(state,"st.ref @global_%d\n", i->index);
     }
 
-    generate_block(state, ast->children[5]);
+    generate_block(state, ast->children[5], inclabel, endlabel);
 
-    append_output(state,"ld.stack 0\nld.int 1\nadd\nst.stack -1\n");
+    append_output(state,"%s: ld.stack 0\nld.int 1\nadd\nst.stack -1\n", inclabel);
     append_output(state,"jmp %s\n%s:\n", startlabel, endlabel);
     append_output(state,"ajs -3\n"); // cleanup
 }
+

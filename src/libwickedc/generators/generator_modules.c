@@ -79,8 +79,6 @@ void generate_imports(generator_state_t *state, mpc_ast_t *ast) {
                 append_output(state, "ld.mapitem \"@init\"\ncall.pop 0\n");
                 append_output(state, "call @import_processor, 0\n");
                 append_output(state, "@skip_init_%s:\n", name);
-
-                // TODO: name is never freed
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                         import->state.row + 1,

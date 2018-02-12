@@ -4,6 +4,8 @@
 
 
 void generate_return(generator_state_t *state, const mpc_ast_t *ast);
+void generate_continue(generator_state_t *state, mpc_ast_t *ast);
+void generate_break(generator_state_t *state, mpc_ast_t *ast);
 
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("stmt|>", ast->tag));
@@ -19,6 +21,10 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
         char* verbatim = str_replace(code + 1, "\\\"", "\"");
         append_output(state,"%s\n", verbatim);
         free(verbatim);
+    } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "continue") == 0) {
+        generate_continue(state, ast);
+    } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "break") == 0) {
+        generate_break(state, ast);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "if") == 0) {
         generate_if(state, ast);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "while") == 0) {
@@ -67,18 +73,47 @@ void generate_return(generator_state_t *state, const mpc_ast_t *ast) {
     }
 }
 
-void generate_block(generator_state_t *state, mpc_ast_t *ast) {
+void generate_block(generator_state_t *state, mpc_ast_t *ast, const char* continue_label, const char* break_label) {
     assert(0 == strcmp("block|>", ast->tag));
 
-    enter_scope(state, "^");
+    char endLabel[32];
+    sprintf(endLabel, "@end_%d", state->uniqueid++);
+
+    enter_scope(state, "^", continue_label, break_label);
 
     for (int i = 0; i < ast->children_num; i++) {
         if (strcmp("stmt|>", ast->children[i]->tag) == 0) {
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
-            append_output(state,"# end\n");
+            append_output(state,"%s: # end\n", endLabel);
         }
     }
 
     leave_scope(state);
+}
+
+void generate_continue(generator_state_t *state, mpc_ast_t *ast) {
+    if (state->num_continue_labels == 0) return;
+    int i = (int)state->num_continue_labels - 1;
+    const char* label = state->continue_labels[i];
+    while (label == NULL && i >= 0) {
+        i--;
+        label = state->continue_labels[i];
+    }
+    if (label != NULL) {
+        append_output(state, "jmp %s\n", label);
+    }
+}
+
+void generate_break(generator_state_t *state, mpc_ast_t *ast) {
+    if (state->num_break_labels == 0) return;
+    int i = (int)state->num_break_labels - 1;
+    char* label = state->break_labels[i];
+    while (label == NULL && i >= 0) {
+        i--;
+        label = state->break_labels[i];
+    }
+    if (label != NULL) {
+        append_output(state, "jmp %s\n", label);
+    }
 }

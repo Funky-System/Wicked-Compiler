@@ -6,6 +6,20 @@
 #include <assert.h>
 #include "../mpc/mpc.h"
 
+void cleanup(generator_state_t *state) {
+    free(state->break_labels);
+    free(state->continue_labels);
+
+    struct hashmap_iter *iter = hashmap_iter(&state->symbol_table);
+    while (iter) {
+        struct symbol_table_entry* entry = symbol_table_hashmap_iter_get_data(iter);
+        //const char* key = symbol_table_hashmap_iter_get_key(iter);
+        free((void*)entry->name);
+        free(entry);
+        iter = hashmap_iter_remove(&state->symbol_table, iter);
+    }
+}
+
 void append_output(generator_state_t *state, const char *format, ...) {
     char buffer[strlen(format) + 2048];
 
@@ -40,13 +54,18 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     generator_state_t state = { 0 };
     state.filename = filename_hint;
 
-    state.output = malloc(0);
+    state.output = malloc(1);
+    state.output[0] = '\0';
 
     state.debug = debug;
+
+    state.continue_labels = malloc(0);
+    state.break_labels = malloc(0);
 
     append_output(&state, "section .data\n@filename: data \"%s\"\nsection .text\n\n", filename_hint);
 
     hashmap_init(&state.symbol_table, hashmap_hash_string, hashmap_compare_string, 0);
+    hashmap_set_key_alloc_funcs(&state.symbol_table, hashmap_alloc_key_string, free);
 
     // the root is always called '>'
     assert('>' == ast->tag[0]);
@@ -73,6 +92,8 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     }
 
     //append_output(&state, "ld.uint 0\nst.reg %%rr\n");
+
+    cleanup(&state);
 
     hashmap_destroy(&state.symbol_table);
 

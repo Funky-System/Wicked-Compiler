@@ -30,7 +30,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
         generate_extends(state, ast->children[2], name);
     }
 
-    enter_scope(state, name);
+    enter_scope(state, name, NULL, NULL);
 
     // scan for fields
     for (int i = 3; i < ast->children_num; i++) {

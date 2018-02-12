@@ -20,7 +20,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
 
     //char *prefix_plus_name = malloc(strlen(prefix) + strlen(name) + 1);
     //strcpy(prefix_plus_name, prefix); strcat(prefix_plus_name, name);
-    enter_scope(state, name);
+    enter_scope(state, name, NULL, NULL);
 
     // scan for locals
     int num_locals = 1 /* 'this' is the first local */, num_params = 0;

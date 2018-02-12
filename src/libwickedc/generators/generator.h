@@ -29,6 +29,12 @@ typedef struct {
     int uniqueid;
     int is_static;
     int is_conv_method;
+
+    char **continue_labels;
+    size_t num_continue_labels;
+    char **break_labels;
+    size_t num_break_labels;
+
     exp_state_t *exp_state;
 } generator_state_t;
 
@@ -44,21 +50,21 @@ enum symbol_type {
 };
 
 struct symbol_table_entry {
-    const char *name;
+    char *name;
     int index;
     enum symbol_type type;
 };
 
 struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const char* ident);
 struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state, mpc_ast_t* identtag);
-void enter_scope(generator_state_t *state, const char* name);
+void enter_scope(generator_state_t *state, const char* name, const char* continue_label, const char* break_label);
 void leave_scope(generator_state_t *state);
 
 void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
 void generate_factor(generator_state_t *state, mpc_ast_t *ast);
 void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* prefix);
-void generate_block(generator_state_t *state, mpc_ast_t *ast);
+void generate_block(generator_state_t *state, mpc_ast_t *ast, const char* continue_label, const char* break_label);
 void generate_decl(generator_state_t *state, mpc_ast_t *ast);
 void generate_if(generator_state_t *state, mpc_ast_t *ast);
 void generate_ident(generator_state_t *state, mpc_ast_t *ast);
@@ -93,5 +99,7 @@ void append_output(generator_state_t *state, const char *format, ...);
 void append_debug_setcontext(generator_state_t *state, mpc_ast_t *ast);
 void append_debug_enterscope(generator_state_t *state, const char* prefix, const char* name);
 void append_debug_leavescope(generator_state_t *state);
+
+void cleanup(generator_state_t *state);
 
 #endif //COMPILER_GENERATOR_H

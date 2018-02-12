@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     struct optparse options;
 
     const char *output = "out.funk";
-    char *asm_output = malloc(strlen(output) + 5);
+    char *asm_output = malloc(strlen(output) + 6);
     strcpy(asm_output, output);
     strcat(asm_output, ".fasm");
     int print_parse_tree = 0, print_parse_tree_folded = 1;
@@ -102,6 +102,10 @@ int main(int argc, char **argv) {
                 strcat(command, "\"");
                 int ret = system(command);
                 if (!keep_asm) remove(asm_output);
+
+                free(asm_output);
+                free(command);
+
                 if (ret == 0) {
                     // yay!
                     return 0;
@@ -111,6 +115,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+
+    free(asm_output);
 
     return 0;
 }

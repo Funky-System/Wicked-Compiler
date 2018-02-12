@@ -35,6 +35,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                 if (strcmp(ast->children[j]->tag, "decl|>") == 0) {
                     char *ident = ast->children[j]->children[0]->contents;
                     char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + 2);
+                    scoped_ident[0] = '\0';
                     if (strlen(state->scope) > 0) {
                         strcpy(scoped_ident, state->scope);
                         strcat(scoped_ident, ".");
@@ -46,23 +47,26 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                     strcat(scoped_ident, ident);
                     if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                         struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-                        e->name = ident;
+                        e->name = strdup(ident);
                         e->index = *num_locals;
                         e->type = type;
                         symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                         (*num_locals)++;
                         if (type == SYMBOL_TYPE_GLOBAL) append_output(state,"@global_%d: var\n", e->index);
+                        free(scoped_ident);
                     } else {
                         fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                                 ast->children[0]->state.row + 1,
                                 ast->children[0]->state.col, ident);
+                        free(scoped_ident);
                         exit(EXIT_FAILURE);
                     }
                 }
             }
         } else if (strcmp("for", ast->children[0]->contents) == 0) {
             char *ident = ast->children[1]->contents;
-            char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + depth * 2 + 2);
+            char *scoped_ident = malloc(strlen(state->scope) + strlen(ident) + depth * 2 + 3);
+            scoped_ident[0] = '\0';
             if (strlen(state->scope) > 0) {
                 strcpy(scoped_ident, state->scope);
                 strcat(scoped_ident, ".");
@@ -74,16 +78,18 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
             strcat(scoped_ident, ident);
             if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                 struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-                e->name = ident;
+                e->name = strdup(ident);
                 e->index = *num_locals;
                 e->type = type;
                 symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                 (*num_locals)++;
                 if (type == SYMBOL_TYPE_GLOBAL) append_output(state,"@global_%d: var\n", e->index);
+                free(scoped_ident);
             } else {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                         ast->children[0]->state.row + 1,
                         ast->children[0]->state.col, ast->children[0]->contents);
+                free(scoped_ident);
                 exit(EXIT_FAILURE);
             }
         }
@@ -104,15 +110,17 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                 strcat(scoped_ident, ident);
                 if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {
                     struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-                    e->name = ident;
+                    e->name = strdup(ident);
                     e->index = cur_param;
                     e->type = SYMBOL_TYPE_PARAM;
                     symbol_table_hashmap_put(&state->symbol_table, scoped_ident, e);
                     cur_param++;
+                    free(scoped_ident);
                 } else {
                     fprintf(stderr, "%s:%ld:%ld error: '%s' is already defined\n", state->filename,
                             ast->children[i]->children[0]->state.row + 1,
                             ast->children[i]->children[0]->state.col, ast->children[i]->children[0]->contents);
+                    free(scoped_ident);
                     exit(EXIT_FAILURE);
                 }
             }
@@ -122,7 +130,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
             struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-            e->name = ast->children[1]->contents;
+            e->name = strdup(ast->children[1]->contents);
             e->index = 0;
             e->type = SYMBOL_TYPE_FUNCTION;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
@@ -137,7 +145,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
             struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-            e->name = ast->children[1]->contents;
+            e->name = strdup(ast->children[1]->contents);
             e->index = 0;
             e->type = SYMBOL_TYPE_CLASS;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
@@ -158,7 +166,7 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
             struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-            e->name = ast->children[1]->contents;
+            e->name = strdup(ast->children[1]->contents);
             e->index = 0;
             e->type = SYMBOL_TYPE_ENUM;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
