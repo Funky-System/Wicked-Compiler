@@ -1,6 +1,6 @@
 import module1
 
-var i = module1.Types.Type2
+var i = module1.Person.b()
 
 asm "
 ld.deref @global_0

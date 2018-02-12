@@ -101,7 +101,7 @@ args       : <arg>? (',' <arg>)* ;
 function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eos> ;
 
 classVar   : "var" <decl> ( ',' <decl> )* <eos> ;
-classDecl  : ( <function> | <classVar> ) ;
+classDecl  : "static"? ( <function> | <classVar> ) ;
 extends    : "extends" <ident> ('.' <ident>)* ;
 class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 

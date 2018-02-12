@@ -9,7 +9,12 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
     append_debug_setcontext(state, ast);
 
     if (strcmp(ast->contents, "this") == 0) {
-        if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
+        if (state->is_static) {
+            fprintf(stderr, "%s:%ld:%ld error: 'this' is not allowed in static context\n", state->filename,
+                    ast->state.row + 1,
+                    ast->state.col);
+            exit(EXIT_FAILURE);
+        } else if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
             fprintf(stderr, "%s:%ld:%ld error: 'this' is not an lvalue\n", state->filename,
                     ast->state.row + 1,
                     ast->state.col);

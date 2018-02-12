@@ -36,13 +36,17 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
     for (int i = 3; i < ast->children_num; i++) {
         if (strcmp("classDecl|>", ast->children[i]->tag) == 0) {
             mpc_ast_t *classDecl = ast->children[i];
-            if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
-                const char *funcName = classDecl->children[0]->children[1]->contents;
-                append_output(state, "# function: %s\n", classDecl->children[0]->children[1]->contents);
+            mpc_ast_t *decl = classDecl->children[classDecl->children_num - 1];
+            if (strcmp(classDecl->children[0]->contents, "static") == 0) {
+                state->is_static = 1;
+            }
+            if (strcmp("function|>", decl->tag) == 0) {
+                const char *funcName = decl->children[1]->contents;
+                append_output(state, "# function: %s\n", decl->children[1]->contents);
                 append_output(state, "ld.ref %s.%s\nld.deref %s\nst.mapitem \"%s\"\n", name, funcName, name, funcName);
             }
-            if (strcmp("classVar|>", classDecl->children[0]->tag) == 0) {
-                mpc_ast_t *classVar = classDecl->children[0];
+            if (strcmp("classVar|>", decl->tag) == 0) {
+                mpc_ast_t *classVar = decl;
                 for (int j = 1; j < classVar->children_num; j++) {
                     if (strcmp("decl|>", classVar->children[j]->tag) == 0) {
                         const char* varName = classVar->children[j]->children[0]->contents;
@@ -60,19 +64,24 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                     }
                 }
             }
+            state->is_static = 0;
         }
     }
 
     for (int i = 3; i < ast->children_num; i++) {
         if (strcmp("classDecl|>", ast->children[i]->tag) == 0) {
             mpc_ast_t *classDecl = ast->children[i];
-            if (strcmp("function|>", classDecl->children[0]->tag) == 0) {
+            mpc_ast_t *decl = classDecl->children[classDecl->children_num - 1];
+            if (strcmp(classDecl->children[0]->contents, "static") == 0) {
+                state->is_static = 1;
+            }
+            if (strcmp("function|>", decl->tag) == 0) {
                 char prefix[128];
                 strcpy(prefix, name);
                 strcat(prefix, ".");
-                generate_function(state, classDecl->children[0], prefix);
-
+                generate_function(state, decl, prefix);
             }
+            state->is_static = 0;
         }
     }
 
