@@ -24,6 +24,11 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
 
     // scan for locals
     int num_locals = 1 /* 'this' is the first local */, num_params = 0;
+
+    if (state->is_conv_method) {
+        num_locals++; // local for the relative stack pos of the to be return result
+    }
+
     populate_symbol_table(state, ast, 0, &num_locals, &num_params, SYMBOL_TYPE_LOCAL);
     //printf("symbol table after locals for function %s%s:\n", prefix, name);
     //print_symbol_table(state);
@@ -31,6 +36,10 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     append_output(state,"locals.res %d\n", num_locals);
     append_output(state, "ld.reg %%r1\n");
     append_output(state, "st.local 0\n");
+    if (state->is_conv_method) {
+        append_output(state, "ld.reg %%r7\n");
+        append_output(state, "st.local 1\n");
+    }
 
     if (num_params > 0) {
         generate_default_params(state, ast->children[3]);
@@ -43,6 +52,13 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
         if (strcmp("stmt|>", ast->children[i]->tag) == 0) {
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
+            if (state->is_conv_method) {
+            append_output(state, "ld.empty\n");
+            append_output(state, "ld.local 1\n");
+            append_output(state, "ld.int 1\nsub\n");
+            append_output(state, "st.arg.pop\n");
+            }
+
             append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\n");
             append_debug_leavescope(state);
             append_output(state,"ret\n");

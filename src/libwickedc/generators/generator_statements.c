@@ -48,9 +48,9 @@ void generate_return(generator_state_t *state, const mpc_ast_t *ast) {
         } else {
             append_output(state, "ld.empty\n");
         }
-        append_output(state, "ld.reg %%r7\n");
-        append_output(state, "ld.int 6\nsub\n");
-        append_output(state, "st.stack.pop\n");
+        append_output(state, "ld.local 1\n");
+        append_output(state, "ld.int 1\nsub\n");
+        append_output(state, "st.arg.pop\n");
         append_output(state, "locals.cleanup\n");
         append_output(state, "args.cleanup\n");
         append_debug_leavescope(state);
