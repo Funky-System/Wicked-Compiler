@@ -21,7 +21,7 @@ void generate_enum(generator_state_t *state, mpc_ast_t *ast) {
                 it = strtol(enumDecl->children[2]->contents, NULL, 0);
             }
             append_output(state, "ld.int %d\n", it++);
-            append_output(state, "ld.deref %s\nderef\n", name);
+            append_output(state, "ld.deref %s\n", name);
             append_output(state, "st.mapitem \"%s\"\n", varName);
         }
     }

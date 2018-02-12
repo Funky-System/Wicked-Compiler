@@ -1,13 +1,9 @@
-enum bla
-    een,
-    twee,
-    drie
-end
+import module1
 
-var i = bla.twee
+var i = module1.Types.Type2
 
 asm "
-ld.addr @global_0
+ld.deref @global_0
 trap 1
 pop
 "
