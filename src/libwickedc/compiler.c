@@ -1,10 +1,9 @@
-#include <mpc/mpc.h>
 #include "mpc/mpc.h"
 
 #include "parser.gen.h"
 
-#include "generator.h"
-#include "compiler.h"
+#include "generators/generator.h"
+#include "wickedc/wickedc.h"
 
 void mpc_unfold(mpc_ast_t *ast) {
     char *loc = strchr(ast->tag, '|');

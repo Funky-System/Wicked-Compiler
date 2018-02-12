@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "compiler.h"
+#include "wickedc/wickedc.h"
 
 #define OPTPARSE_IMPLEMENTATION
 #define OPTPARSE_API static

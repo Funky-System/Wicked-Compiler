@@ -4,7 +4,7 @@
 
 #include "generator.h"
 #include <assert.h>
-#include <mpc/mpc.h>
+#include "../mpc/mpc.h"
 
 void append_output(generator_state_t *state, const char *format, ...) {
     char buffer[strlen(format) + 2048];

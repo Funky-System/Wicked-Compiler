@@ -5,9 +5,9 @@
 #ifndef COMPILER_GENERATOR_H
 #define COMPILER_GENERATOR_H
 
-#include <mpc/mpc.h>
+#include "../mpc/mpc.h"
 
-#include "hashmap.h"
+#include "../hashmap.h"
 
 #define str_startswith(str, strstart) (strstr(str, strstart) == (str))
 

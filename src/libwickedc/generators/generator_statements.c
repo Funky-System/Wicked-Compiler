@@ -1,6 +1,6 @@
 #include <assert.h>
 #include "generator.h"
-#include "string_functions.h"
+#include "src/libwickedc/string_functions.h"
 
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("stmt|>", ast->tag));

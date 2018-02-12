@@ -1,0 +1,7 @@
+import io
+
+var val = "string"
+
+#var val = ["s", "t", "r", "i", "n", "g"]
+
+io.print("value: " + val[1:7] + "\n")

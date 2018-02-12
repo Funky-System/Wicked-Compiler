@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <mpc/mpc.h>
 #include "generator.h"
 
 void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast) {

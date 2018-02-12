@@ -3,15 +3,34 @@ project(wickedc)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h
-        COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/generate_parser.sh grammar ${CMAKE_CURRENT_SOURCE_DIR}/wicked.grammar ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h
-        DEPENDS wicked.grammar
+        COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tools/generate_parser.sh grammar ${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar
 )
 
-add_library(wickedc mpc/mpc.c ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c generator.c generator.h hashmap.c generator_expressions.c generator_symbols.c generator_functions.c generator_statements.c generator_variables.c generator_if.c generator_while.c generator_arrays.c compiler.c compiler.h generator_class.c generator_modules.c generator_enum.c string_functions.c string_functions.h)
-add_executable(wickedc-bin main.c)
+add_library(wickedc src/libwickedc/mpc/mpc.c
+        ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c
+        ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c
+        src/libwickedc/hashmap.c
+        src/libwickedc/compiler.c
+        src/libwickedc/generators/generator.c
+        src/libwickedc/generators/generator_expressions.c
+        src/libwickedc/generators/generator_symbols.c
+        src/libwickedc/generators/generator_functions.c
+        src/libwickedc/generators/generator_statements.c
+        src/libwickedc/generators/generator_variables.c
+        src/libwickedc/generators/generator_if.c
+        src/libwickedc/generators/generator_while.c
+        src/libwickedc/generators/generator_arrays.c
+        src/libwickedc/generators/generator_class.c
+        src/libwickedc/generators/generator_modules.c
+        src/libwickedc/generators/generator_enum.c
+        src/libwickedc/string_functions.c)
+add_executable(wickedc-bin src/main.c)
 target_link_libraries(wickedc-bin wickedc)
 set_target_properties(wickedc-bin PROPERTIES OUTPUT_NAME wickedc)
+
+file(COPY include DESTINATION ${CMAKE_BINARY_DIR})
