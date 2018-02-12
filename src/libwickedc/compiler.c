@@ -33,42 +33,41 @@ void mpc_unfold(mpc_ast_t *ast) {
 }
 
 int compile_file_to_file(const char *filename_in, const char* filename_out, int debug) {
-    mpc_err_t *err = generate_parser_grammar();
-
-    if (err != NULL) {
-        mpc_err_print(err);
-        mpc_err_delete(err);
-        return 0;
+    FILE *fp;
+    fp = fopen(filename_in, "r");
+    if (fp == NULL) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not open file %s\n", filename_in);
+        fprintf(stderr, "%s", strerror(errnum));
+        exit(EXIT_FAILURE);
     }
 
-    if (filename_in != NULL) {
-        mpc_result_t r;
-        if (mpc_parse_contents(filename_in, parser_wicked, &r)) {
-            mpc_unfold(r.output);
-            char *output = generate(filename_in, debug, (mpc_ast_t*)r.output);
+    fseek(fp, 0L, SEEK_END);
+    size_t numbytes = (size_t)ftell(fp);
 
-            FILE *fp = fopen(filename_out, "wb");
+    // reset the file position indicator to the beginning of the file
+    fseek(fp, 0L, SEEK_SET);
 
-            if (fp == NULL) {
-                int errnum = errno;
-                printf("Error: Could not write to file %s\n", filename_out);
-                printf("%s\n", strerror(errnum));
-                return 0;
-            }
+    char *code_in = malloc(numbytes + 1);
+    fread(code_in, sizeof(char), numbytes, fp);
+    code_in[numbytes] = '\0';
 
-            fputs(output, fp);
+    fclose(fp);
 
-            fclose(fp);
-            free(output);
+    char *output = compile_string_to_string(filename_in, code_in, debug);
+    free(code_in);
 
-            mpc_ast_delete(r.output);
-        } else {
-            mpc_err_print(r.error);
-            mpc_err_delete(r.error);
-            cleanup_parser_grammar();
-            return 0;
-        }
+    FILE *outFile = fopen(filename_out, "wb");
+    if (outFile == NULL) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not write to file %s\n", filename_out);
+        fprintf(stderr, "%s\n", strerror(errnum));
+        exit(EXIT_FAILURE);
     }
+    fwrite(output, sizeof(char), strlen(output), outFile);
+    free(output);
+
+    fclose(outFile);
 
     return 1;
 }
@@ -83,15 +82,23 @@ char* compile_string_to_string(const char *filename_hint, const char *input, int
         return 0;
     }
 
+    size_t len = strlen(input);
+    char *input_newline = malloc(len + 2);
+    memcpy(input_newline, input, len);
+    input_newline[len] = '\n';
+    input_newline[len + 1] = '\0';
+
     mpc_result_t r;
-    if (mpc_parse(filename_hint, input, parser_wicked, &r)) {
+    if (mpc_parse(filename_hint, input_newline, parser_wicked, &r)) {
         mpc_unfold(r.output);
         char *output = generate(filename_hint, debug, (mpc_ast_t*)r.output);
+        free(input_newline);
         mpc_ast_delete(r.output);
         return output;
     } else {
         mpc_err_print(r.error);
         mpc_err_delete(r.error);
+        free(input_newline);
         cleanup_parser_grammar();
         return 0;
     }
