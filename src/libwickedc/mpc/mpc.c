@@ -1846,7 +1846,7 @@ static int mpc_boundary_anchor(char prev, char next) {
 mpc_parser_t *mpc_boundary(void) { return mpc_expect(mpc_anchor(mpc_boundary_anchor), "boundary"); }
 
 mpc_parser_t *mpc_whitespace(void) { return mpc_expect(mpc_oneof(" \f\n\r\t\v"), "whitespace"); }
-mpc_parser_t *mpc_whitespace_nonl(void) { return mpc_expect(mpc_oneof(" \f\r\t\v"), "whitespace (no newline)"); }
+mpc_parser_t *mpc_whitespace_nonl(void) { return mpc_expect(mpc_or(2, mpc_string("_\n"), mpc_oneof(" \f\r\t\v")), "whitespace (no newline)"); }
 mpc_parser_t *mpc_whitespaces(void) { return mpc_expect(mpc_many(mpcf_strfold, mpc_whitespace()), "spaces"); }
 mpc_parser_t *mpc_whitespaces_nonl(void) { return mpc_expect(mpc_many(mpcf_strfold, mpc_whitespace_nonl()), "spaces (no newline)"); }
 mpc_parser_t *mpc_blank(void) { return mpc_expect(mpc_apply(mpc_whitespaces(), mpcf_free), "whitespace"); }
