@@ -1,0 +1,31 @@
+#import io
+
+class Hoi
+    function string()
+        return "Hoi"
+    end
+end
+
+class Bas
+
+    var name = "Bas"
+
+    function new(name = "Bassie")
+        this.name = name
+    end
+
+    function string()
+        var hoi = new Hoi
+        return hoi + " " + this.name
+    end
+
+end
+
+var val = new Bas("Sebastiaan")
+var val2 = "" + val
+
+asm "
+    ld.deref @global_1
+    trap 1
+    pop
+"

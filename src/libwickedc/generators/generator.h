@@ -28,6 +28,7 @@ typedef struct {
     char scope[2048];
     int uniqueid;
     int is_static;
+    int is_conv_method;
     exp_state_t *exp_state;
 } generator_state_t;
 

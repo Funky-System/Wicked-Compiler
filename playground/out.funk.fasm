@@ -1,0 +1,229 @@
+section .data
+@filename: data "test.wckd"
+section .text
+
+section .data
+Hoi: var
+section .text
+ld.map
+st.ref Hoi
+section .data
+Bas: var
+section .text
+ld.map
+st.ref Bas
+section .data
+@global_0: var
+@global_1: var
+
+section .text
+debug.setcontext @filename, 3, 0
+# Class name: Hoi
+# alloc Hoi
+# function: string
+ld.ref Hoi.string
+ld.deref Hoi
+st.mapitem "string"
+# Function name: Hoi.string
+jmp @Hoi.string__end
+Hoi.string: 
+debug.enterscope "Hoi.string"
+args.accept 0
+locals.res 1
+ld.reg %r1
+st.local 0
+debug.setcontext @filename, 5, 8
+ld.str "Hoi"
+ld.reg %r7
+ld.int 6
+sub
+st.stack.pop
+locals.cleanup
+args.cleanup
+debug.leavescope
+ret
+locals.cleanup
+args.cleanup
+ld.int 0
+st.reg %rr
+debug.leavescope
+ret
+@Hoi.string__end: # end
+
+#allocator
+jmp @Hoi__end
+@alloc_Hoi:
+debug.enterscope "@alloc_Hoi"
+ld.map
+ld.deref Hoi
+ld.stack -1
+map.setprototype
+ld.uint 1
+ld.stack -1
+st.mapitem "@is_instance"
+st.reg %rr
+debug.leavescope
+ret
+@Hoi__end:
+ld.ref @alloc_Hoi
+ld.deref Hoi
+st.mapitem "@alloc"
+
+
+debug.setcontext @filename, 9, 0
+# Class name: Bas
+# alloc Bas
+# var: name
+ld.str "Bas"
+ld.deref Bas
+st.mapitem "name"
+
+# function: new
+ld.ref Bas.new
+ld.deref Bas
+st.mapitem "new"
+# function: string
+ld.ref Bas.string
+ld.deref Bas
+st.mapitem "string"
+# Function name: Bas.new
+jmp @Bas.new__end
+Bas.new: 
+debug.enterscope "Bas.new"
+args.accept 1
+locals.res 1
+ld.reg %r1
+st.local 0
+# default argument value for 0
+ld.arg 0
+is.empty
+brfalse @skip_0
+ld.str "Bassie"
+st.arg 0
+@skip_0:
+pop
+debug.setcontext @filename, 14, 8
+debug.setcontext @filename, 14, 20
+ld.arg 0
+debug.setcontext @filename, 14, 8
+ld.local 0
+debug.setcontext @filename, 14, 13
+ld.stack -1
+st.reg %r2
+st.mapitem "name"
+ld.reg %r2
+pop
+locals.cleanup
+args.cleanup
+ld.int 0
+st.reg %rr
+debug.leavescope
+ret
+@Bas.new__end: # end
+
+# Function name: Bas.string
+jmp @Bas.string__end
+Bas.string: 
+debug.enterscope "Bas.string"
+args.accept 0
+locals.res 2
+ld.reg %r1
+st.local 0
+debug.setcontext @filename, 18, 8
+debug.setcontext @filename, 18, 18
+debug.setcontext @filename, 18, 22
+ld.deref Hoi
+ld.mapitem "@alloc"
+call.pop 0
+ld.reg %rr
+dup
+ld.mapitem "new"
+is.empty
+brtrue @skip_1
+ld.stack -1
+st.reg %r1
+ld.stack 0
+call.pop 0
+@skip_1:
+pop
+@end_1:
+st.local 1
+debug.setcontext @filename, 19, 8
+debug.setcontext @filename, 19, 15
+ld.local 1
+ld.str " "
+add
+debug.setcontext @filename, 19, 27
+ld.local 0
+debug.setcontext @filename, 19, 32
+ld.mapitem "name"
+add
+ld.reg %r7
+ld.int 6
+sub
+st.stack.pop
+locals.cleanup
+args.cleanup
+debug.leavescope
+ret
+locals.cleanup
+args.cleanup
+ld.int 0
+st.reg %rr
+debug.leavescope
+ret
+@Bas.string__end: # end
+
+#allocator
+jmp @Bas__end
+@alloc_Bas:
+debug.enterscope "@alloc_Bas"
+ld.map
+ld.deref Bas
+ld.stack -1
+map.setprototype
+ld.uint 1
+ld.stack -1
+st.mapitem "@is_instance"
+st.reg %rr
+debug.leavescope
+ret
+@Bas__end:
+ld.ref @alloc_Bas
+ld.deref Bas
+st.mapitem "@alloc"
+
+
+debug.setcontext @filename, 24, 0
+debug.setcontext @filename, 24, 10
+debug.setcontext @filename, 24, 14
+ld.deref Bas
+ld.mapitem "@alloc"
+call.pop 0
+ld.reg %rr
+dup
+ld.mapitem "new"
+is.empty
+brtrue @skip_2
+debug.setcontext @filename, 24, 17
+ld.str "Sebastiaan"
+ld.stack -2
+st.reg %r1
+ld.stack -1
+call.pop 1
+@skip_2:
+pop
+@end_2:
+st.ref @global_0
+debug.setcontext @filename, 25, 0
+ld.str ""
+debug.setcontext @filename, 25, 16
+ld.deref @global_0
+add
+st.ref @global_1
+debug.setcontext @filename, 27, 0
+
+    ld.deref @global_1
+    trap 1
+    pop
+

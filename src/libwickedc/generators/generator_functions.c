@@ -7,6 +7,11 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     assert(0 == strcmp("function|>", ast->tag));
 
     char *name = ast->children[1]->contents;
+
+    if (strcmp(name, "string") == 0) {
+        state->is_conv_method = 1;
+    }
+
     append_output(state,"# Function name: %s%s\n", prefix, name);
     append_output(state,"jmp @%s%s__end\n", prefix, name);
     append_output(state,"%s%s: \n", prefix, name);
@@ -48,6 +53,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
 
     append_output(state, "\n");
     leave_scope(state);
+    state->is_conv_method = 0;
 }
 
 void generate_default_params(generator_state_t *state, mpc_ast_t *ast) {
