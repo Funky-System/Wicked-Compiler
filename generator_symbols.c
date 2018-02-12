@@ -27,6 +27,11 @@ void generate_ident(generator_state_t *state, mpc_ast_t *ast) {
         return;
     }
 
+    if (strcmp(ast->contents, "empty") == 0) {
+        append_output(state,"ld.empty\n");
+        return;
+    }
+
     if (state->exp_state != NULL && state->exp_state->is_lvalue && state->exp_state->is_last_member) {
         // this is an assignment to an ident
         if (state->exp_state->is_first_member) {
