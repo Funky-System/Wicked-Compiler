@@ -185,7 +185,7 @@ struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state,
             if (entry == NULL) {
                 fprintf(stderr, "%s:%ld:%ld error: '%s' is not defined\n", state->filename,
                         identtag->state.row + 1,
-                        identtag->children[0]->state.col, scoped_ident);
+                        identtag->state.col, scoped_ident);
                 exit(EXIT_FAILURE);
             }
         } else {
