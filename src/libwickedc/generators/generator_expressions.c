@@ -87,6 +87,11 @@ void generate_methodCall(generator_state_t *state, mpc_ast_t *ast, int this_alre
         exit(EXIT_FAILURE);
     }
 
+    if (strcmp(ast->children[0]->contents, "string") == 0) {
+        append_output(state, "conv.str\n");
+        return;
+    }
+
     if (!this_already_on_stack) append_output(state, "dup\n");
     append_output(state, "ld.mapitem \"%s\"\n", ast->children[0]->contents);
 

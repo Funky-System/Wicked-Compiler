@@ -29,19 +29,26 @@ jmp @Hoi.string__end
 Hoi.string: 
 debug.enterscope "Hoi.string"
 args.accept 0
-locals.res 1
+locals.res 2
 ld.reg %r1
 st.local 0
+ld.reg %r7
+st.local 1
 debug.setcontext @filename, 5, 8
 ld.str "Hoi"
-ld.reg %r7
-ld.int 6
+ld.local 1
+ld.int 1
 sub
-st.stack.pop
+st.arg.pop
 locals.cleanup
 args.cleanup
 debug.leavescope
 ret
+ld.empty
+ld.local 1
+ld.int 1
+sub
+st.arg.pop
 locals.cleanup
 args.cleanup
 ld.int 0
@@ -126,9 +133,11 @@ jmp @Bas.string__end
 Bas.string: 
 debug.enterscope "Bas.string"
 args.accept 0
-locals.res 2
+locals.res 3
 ld.reg %r1
 st.local 0
+ld.reg %r7
+st.local 1
 debug.setcontext @filename, 18, 8
 debug.setcontext @filename, 18, 18
 debug.setcontext @filename, 18, 22
@@ -147,10 +156,10 @@ call.pop 0
 @skip_1:
 pop
 @end_1:
-st.local 1
+st.local 2
 debug.setcontext @filename, 19, 8
 debug.setcontext @filename, 19, 15
-ld.local 1
+ld.local 2
 ld.str " "
 add
 debug.setcontext @filename, 19, 27
@@ -158,14 +167,19 @@ ld.local 0
 debug.setcontext @filename, 19, 32
 ld.mapitem "name"
 add
-ld.reg %r7
-ld.int 6
+ld.local 1
+ld.int 1
 sub
-st.stack.pop
+st.arg.pop
 locals.cleanup
 args.cleanup
 debug.leavescope
 ret
+ld.empty
+ld.local 1
+ld.int 1
+sub
+st.arg.pop
 locals.cleanup
 args.cleanup
 ld.int 0
@@ -216,10 +230,12 @@ pop
 @end_2:
 st.ref @global_0
 debug.setcontext @filename, 25, 0
-ld.str ""
-debug.setcontext @filename, 25, 16
+debug.setcontext @filename, 25, 11
 ld.deref @global_0
-add
+debug.setcontext @filename, 25, 15
+conv.str
+ld.int 5
+gt
 st.ref @global_1
 debug.setcontext @filename, 27, 0
 

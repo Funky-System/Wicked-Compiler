@@ -22,7 +22,7 @@ class Bas
 end
 
 var val = new Bas("Sebastiaan")
-var val2 = "" + val
+var val2 = val.string() > 5
 
 asm "
     ld.deref @global_1

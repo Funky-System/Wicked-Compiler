@@ -42,7 +42,13 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     }
 
     if (num_params > 0) {
-        generate_default_params(state, ast->children[3]);
+        if (state->is_conv_method) {
+            fprintf(stderr, "%s:%ld:%ld error: conversion method do not take any parameters\n", state->filename,
+                    ast->children[3]->state.row + 1, ast->children[3]->state.col);
+            exit(EXIT_FAILURE);
+        } else {
+            generate_default_params(state, ast->children[3]);
+        }
     }
 
     int index = mpc_ast_get_index(ast, "stmt|>");
