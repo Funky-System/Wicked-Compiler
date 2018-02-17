@@ -87,6 +87,8 @@ CPU_State compile_and_run(const char *wckd_code) {
 
     vm_type_t ret = cpu_run(&state);
 
+    EXPECT_EQ(state.in_error_state, 0) << "VM ended in an error state";
+
     memory_destroy(&memory);
     free(main_memory);
 

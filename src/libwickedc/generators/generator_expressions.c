@@ -338,7 +338,7 @@ void generate_prec11(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"le\n");
         } else if (strcmp(oper, ">") == 0) {
             append_output(state,"gt\n");
-        } else if (strcmp(oper, "ge") == 0) {
+        } else if (strcmp(oper, ">=") == 0) {
             append_output(state,"ge\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
