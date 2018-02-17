@@ -430,7 +430,7 @@ void generate_prec06(generator_state_t *state, mpc_ast_t *ast) {
         int andnum = state->uniqueid++;
 
         for (int i = 1; i < ast->children_num; i += 2) {
-            append_output(state,"dup\nbrfalse endand_%d\n", andnum);
+            append_output(state,"brfalse endand_%d\n", andnum);
             char *oper = ast->children[i]->contents;
             if (strcmp(oper, "&&") == 0) {
                 generate_prec07(state, ast->children[i + 1]);
@@ -454,7 +454,7 @@ void generate_prec05(generator_state_t *state, mpc_ast_t *ast) {
         int ornum = state->uniqueid++;
 
         for (int i = 1; i < ast->children_num; i += 2) {
-            append_output(state,"dup\nbrtrue endor_%d\n", ornum);
+            append_output(state,"brtrue endor_%d\n", ornum);
             char *oper = ast->children[i]->contents;
             if (strcmp(oper, "||") == 0) {
                 generate_prec06(state, ast->children[i + 1]);

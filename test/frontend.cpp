@@ -43,7 +43,12 @@ void load_testlib(CPU_State *state) {
     fseek(fp, 0L, SEEK_SET);
 
     auto code_in = (char *) malloc(numbytes + 1);
-    fread(code_in, sizeof(char), numbytes, fp);
+    if (fread(code_in, sizeof(char), numbytes, fp) != numbytes) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not read complete file\n");
+        fprintf(stderr, "%s", strerror(errnum));
+        exit(EXIT_FAILURE);
+    }
     code_in[numbytes] = '\0';
 
     fclose(fp);
