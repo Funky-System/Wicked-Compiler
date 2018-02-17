@@ -2,6 +2,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads REQUIRED)
 
+set(CMAKE_BUILD_TYPE Release)
+
 # Enable ExternalProject CMake module
 include(ExternalProject)
 
