@@ -1,5 +1,9 @@
 language: c
 
+env:
+  - CMAKE_PARAMS="-DCMAKE_BUILD_TYPE=Debug"
+  - CMAKE_PARAMS="-DCMAKE_BUILD_TYPE=Release"
+
 matrix:
   include:
     - os: linux
@@ -95,4 +99,4 @@ before_install:
 #        - mkdir build && cd build && cmake .. && make
 #        - cd test && ./testwickedc
 
-script: mkdir build && cd build && cmake .. && make
+script: mkdir build && cd build && cmake ${CMAKE_PARAMS} .. && make
