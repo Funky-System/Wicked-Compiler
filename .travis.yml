@@ -4,6 +4,16 @@ compiler:
   - clang
   - gcc
 
+os:
+  - linux
+  - osx
+
+osx_image:
+  - xcode9.3beta
+  - xcode9
+  - xcode8
+  - xcode6.4
+
 script:
   - mkdir build
   - cd build
