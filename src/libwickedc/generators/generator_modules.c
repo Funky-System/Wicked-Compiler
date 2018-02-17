@@ -1,4 +1,4 @@
-#import "generator.h"
+#include "generator.h"
 
 void generate_import_processor(generator_state_t *state) {
     append_output(state, "jmp @import_processor_end\n@import_processor:\n");

@@ -1,7 +1,0 @@
-export function print(str)
-   asm "
-       ld.arg 0
-       syscall.byname \"print\"
-       pop
-   "
-end

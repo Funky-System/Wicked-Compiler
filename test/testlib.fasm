@@ -1,0 +1,14 @@
+section .exports
+    export.as assert, "fassert"
+
+section .text
+    jmp @assert__end
+    assert:
+        args.accept 2
+        ld.arg 0
+        ld.arg 1
+        syscall.byname "assert"
+        ajs -2
+        args.cleanup
+        ret
+    @assert__end:
