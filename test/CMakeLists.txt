@@ -1,3 +1,5 @@
+set(CMAKE_CXX_STANDARD 11)
+
 find_package(Threads REQUIRED)
 
 # Enable ExternalProject CMake module
@@ -42,7 +44,6 @@ include_directories("${source_dir}/googletest/include"
 
 
 if (NOT TARGET funky-as)
-    # import assembler
     ExternalProject_Add(
             EXT_funky-as
             GIT_REPOSITORY https://github.com/Funky-System/Funky-Assembler.git
@@ -59,14 +60,33 @@ if (NOT TARGET funky-as)
     include_directories("${source_dir}/include")
 endif()
 
+if (NOT TARGET funky-vm)
+    ExternalProject_Add(
+            EXT_funky-vm
+            GIT_REPOSITORY https://github.com/Funky-System/Funky-VM.git
+            GIT_TAG master
+            PREFIX ${CMAKE_CURRENT_BINARY_DIR}/funky-vm
+            # Disable install step
+            INSTALL_COMMAND ""
+    )
+    ExternalProject_Get_Property(EXT_funky-vm source_dir binary_dir)
+    add_library(funky-vm IMPORTED STATIC GLOBAL)
+    add_dependencies(funky-vm EXT_funky-vm)
+    set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-vm.a"
+            "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+    include_directories("${source_dir}/include")
+endif()
+
 
 
 
 file(GLOB SRCS *.cpp)
 
-ADD_EXECUTABLE(testwickedc ${SRCS})
+ADD_EXECUTABLE(testwickedc ${SRCS} frontend.cpp frontend.h basic.spec.cpp)
 
 #add_dependencies(testwickedc funky-as)
-TARGET_LINK_LIBRARIES(testwickedc libgtest libgmock wickedc funky-as)
+TARGET_LINK_LIBRARIES(testwickedc libgtest libgmock wickedc funky-as funky-vm)
 
 add_test(NAME testwickedc COMMAND testwickedc)
+
+configure_file(testlib.fasm testlib.fasm COPYONLY)
