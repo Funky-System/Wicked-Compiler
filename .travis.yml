@@ -86,29 +86,10 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-#jobs:
-#  include:
-#    - stage: compile
-#      script: mkdir build && cd build && cmake .. && make
-#    - stage: test
-#      script:
-#        - mkdir build && cd build && cmake .. && make
-#        - cd test && ./testwickedc
-
-stages:
-  - name: "Debug"
-    script:
-      - mkdir build
-      - cd build
-      - cmake -DCMAKE_BUILD_TYPE=Debug ..
-      - make
-      - cd test
-      - ./testwickedc
-  - name: "Release"
-    script:
-      - mkdir build
-      - cd build
-      - cmake -DCMAKE_BUILD_TYPE=Release ..
-      - make
-      - cd test
-      - ./testwickedc
+script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
+  - make
+  - cd test
+  - ./testwickedc
