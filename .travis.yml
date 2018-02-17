@@ -104,7 +104,7 @@ stages:
       - make
       - cd test
       - ./testwickedc
-  - name: "Debug"
+  - name: "Release"
     script:
       - mkdir build
       - cd build
