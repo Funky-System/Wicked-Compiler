@@ -78,7 +78,7 @@ if (NOT TARGET funky-vm)
 endif()
 
 
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
 
 file(GLOB SRCS *.cpp)
 
@@ -89,4 +89,4 @@ TARGET_LINK_LIBRARIES(testwickedc libgtest libgmock wickedc funky-as funky-vm)
 
 add_test(NAME testwickedc COMMAND testwickedc)
 
-configure_file(testlib.fasm testlib.fasm COPYONLY)
+configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/testlib.fasm COPYONLY)
