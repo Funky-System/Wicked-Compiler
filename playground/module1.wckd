@@ -1,5 +1,0 @@
-export bla
-
-function bla()
-    return 123
-end
