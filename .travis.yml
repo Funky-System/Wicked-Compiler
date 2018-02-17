@@ -1,4 +1,4 @@
-language: c
+#language: c
 
 matrix:
   include:
@@ -86,12 +86,13 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
 
-jobs:
-  include:
-    - stage: compile
-      script: mkdir build && cd build && cmake .. && make
-    - stage: test
-      script:
-        - mkdir build && cd build && cmake .. && make
-        - cd test && ./testwickedc
+#jobs:
+#  include:
+#    - stage: compile
+#      script: mkdir build && cd build && cmake .. && make
+#    - stage: test
+#      script:
+#        - mkdir build && cd build && cmake .. && make
+#        - cd test && ./testwickedc
 
+script: mkdir build && cd build && cmake .. && make
