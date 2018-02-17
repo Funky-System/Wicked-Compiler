@@ -49,7 +49,12 @@ int compile_file_to_file(const char *filename_in, const char* filename_out, int 
     fseek(fp, 0L, SEEK_SET);
 
     char *code_in = malloc(numbytes + 1);
-    fread(code_in, sizeof(char), numbytes, fp);
+    if (fread(code_in, sizeof(char), numbytes, fp) != numbytes) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not read entire file %s\n", filename_in);
+        fprintf(stderr, "%s", strerror(errnum));
+        exit(EXIT_FAILURE);
+    }
     code_in[numbytes] = '\0';
 
     fclose(fp);
