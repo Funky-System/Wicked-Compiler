@@ -81,5 +81,5 @@ jobs:
     - stage: test
       script:
         - mkdir build && cd build && cmake .. && make
-        - cd build/test && ./testwickedc
+        - cd test && ./testwickedc
 
