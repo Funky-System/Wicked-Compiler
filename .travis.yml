@@ -79,5 +79,7 @@ jobs:
     - stage: compile
       script: mkdir build && cd build && cmake .. && make
     - stage: test
-      script: cd build/test && ./testwickedc
+      script:
+        - mkdir build && cd build && cmake .. && make
+        - cd build/test && ./testwickedc
 
