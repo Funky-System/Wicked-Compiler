@@ -9,15 +9,13 @@
 
 #include "gtest/gtest.h"
 
+int test_testlib_assert = 0;
+
 extern "C" {
 
 #include "wickedc/wickedc.h"
 #include "funkyas/funkyas.h"
 #include "funkyvm/funkyvm.h"
-
-};
-
-int test_testlib_assert = 0;
 
 void in_vm_assert(CPU_State *state) {
     if (test_testlib_assert == 1) { // used to unit test calling of this function through the testlib module
@@ -60,15 +58,18 @@ void load_testlib(CPU_State *state) {
 
 CPU_State compile_and_run(const char *wckd_code) {
     char *fasm = compile_string_to_string("<test:wckd>", wckd_code, 0);
-    EXPECT_TRUE(fasm != NULL); if (fasm == NULL) return (CPU_State) { 0 };
+    EXPECT_TRUE(fasm != NULL);
+    if (fasm == NULL) return (CPU_State) {0};
 
     funky_bytecode_t funk = funky_assemble("<test:fasm>", fasm, 0);
     free(fasm);
 
-    EXPECT_TRUE(funk.bytes != NULL); if (funk.bytes == NULL) return (CPU_State) { 0 };
-    EXPECT_GT(funk.length, 0); if (funk.length == 0) return (CPU_State) { 0 };
+    EXPECT_TRUE(funk.bytes != NULL);
+    if (funk.bytes == NULL) return (CPU_State) {0};
+    EXPECT_GT(funk.length, 0);
+    if (funk.length == 0) return (CPU_State) {0};
 
-    auto main_memory = (byte_t *) malloc(VM_MEMORY_LIMIT);
+    auto main_memory = (byte_t *) calloc(VM_MEMORY_LIMIT, 1);
     Memory memory;
     memory_init(&memory, main_memory);
 
@@ -86,8 +87,10 @@ CPU_State compile_and_run(const char *wckd_code) {
 
     vm_type_t ret = cpu_run(&state);
 
-    free(main_memory);
     memory_destroy(&memory);
+    free(main_memory);
 
     return state;
 }
+
+};
