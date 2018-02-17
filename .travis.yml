@@ -4,6 +4,10 @@ env:
   - CMAKE_PARAMS="-DCMAKE_BUILD_TYPE=Debug"
   - CMAKE_PARAMS="-DCMAKE_BUILD_TYPE=Release"
 
+env:
+  - test=1
+  - test=2
+
 matrix:
   include:
     - os: linux
