@@ -2,7 +2,6 @@
 // Created by Bas du Pré on 17-02-18.
 //
 
-#include <cmake-build-debug/test/funky-vm/src/EXT_funky-vm/include/funkyvm/funkyvm.h>
 #include "gtest/gtest.h"
 #include "frontend.h"
 
