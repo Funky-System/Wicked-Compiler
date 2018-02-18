@@ -50,3 +50,17 @@ TEST(Arrays, Concatenation) {
     compile_and_run(raw_str);
 }
 
+TEST(Arrays, Ranges) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        var array = 1..5
+
+        testlib.assert(array[1] == 2)
+        testlib.assert(array[4] == 5)
+
+    )wckd";
+
+    compile_and_run(raw_str);
+}
+

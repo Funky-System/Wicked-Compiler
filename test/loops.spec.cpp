@@ -11,6 +11,13 @@ TEST(Loops, DoWhile) {
             i += 1
         loop while i < 10
 
+        var test = 0
+        i = 11
+        do
+            test = 1
+            i += 1
+        loop while i < 10
+        testlib.assert(test == 1)
     )wckd";
 
     compile_and_run(raw_str);
@@ -20,15 +27,13 @@ TEST(Loops, While) {
     auto raw_str = R"wckd(
         import testlib
 
-        var array = [1, 2, 3]
+        var i = 0
+        while i < 10 do
+            testlib.assert(i < 10)
+            i += 1
+        end
 
-        testlib.assert(array[1] == 2)
-        array[1] = 4
-        testlib.assert(array[1] == 4)
-
-        array[5] = 9
-        testlib.assert(array[5] == 9)
-        testlib.assert(array[4] == empty)
+        testlib.assert(i == 10)
     )wckd";
 
     compile_and_run(raw_str);
@@ -38,16 +43,14 @@ TEST(Loops, For) {
     auto raw_str = R"wckd(
         import testlib
 
-        var array1 = [1, 2, 3]
-        var array2 = ["a", "b", "c"]
+        var j = 0
 
-        testlib.assert(array1[1] == 2)
-        testlib.assert(array2[1] == "b")
+        for i in 1..5 do
+            j += i
+        end
 
-        var array3 = array1 + array2
+        testlib.assert(j == 15)
 
-        testlib.assert(array3[2] == 3)
-        testlib.assert(array3[3] == "a")
     )wckd";
 
     compile_and_run(raw_str);
@@ -57,16 +60,15 @@ TEST(Loops, BreakAndContinue) {
     auto raw_str = R"wckd(
         import testlib
 
-        var array1 = [1, 2, 3]
-        var array2 = ["a", "b", "c"]
+        var j = 0
 
-        testlib.assert(array1[1] == 2)
-        testlib.assert(array2[1] == "b")
+        for i in 1..20 do
+            if i == 2 then continue
+            j += i
+            if i == 10 then break
+        end
 
-        var array3 = array1 + array2
-
-        testlib.assert(array3[2] == 3)
-        testlib.assert(array3[3] == "a")
+        testlib.assert(j == 53)
     )wckd";
 
     compile_and_run(raw_str);
