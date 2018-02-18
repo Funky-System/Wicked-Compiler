@@ -41,3 +41,5 @@ install(TARGETS wickedc-bin DESTINATION bin)
 
 enable_testing()
 add_subdirectory(test)
+
+add_subdirectory(stdlib)

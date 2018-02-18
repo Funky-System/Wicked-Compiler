@@ -1,0 +1,11 @@
+(prototypeof array).length = arrayLength
+function arrayLength()
+    var length = 0
+    asm "
+        ld.local 0
+        ld.mapitem \"value\"
+        arr.len
+        st.local 1
+    "
+    return length
+end
