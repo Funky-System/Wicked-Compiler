@@ -96,11 +96,14 @@ stmt      : "do" <doBlock> ("while" <exp> <eos>)?
           | <comment>
           ;
 
+syscallAlias : '<' <ident> '>' ;
 arg        : <ident> '=' <exp>
            | <ident>
            ;
 args       : <arg>? (',' <arg>)* ;
-function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eos> ;
+function   : "function" <ident> '(' <args> ')' <eos> (<stmt> | <eos>)* "end" <eos>
+           | "syscall" <syscallAlias>? <ident> '(' <args> ')' <eos>
+           ;
 
 classVar   : "var" <decl> ( ',' <decl> )* <eos> ;
 classDecl  : "static"? ( <function> | <classVar> ) ;

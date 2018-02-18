@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
                 break;
             case 'o':
                 output = options.optarg;
-                asm_output = malloc(strlen(output) + 5);
+                asm_output = malloc(strlen(output) + 6);
                 strcpy(asm_output, output);
                 strcat(asm_output, ".fasm");
                 break;
@@ -100,6 +100,7 @@ int main(int argc, char **argv) {
                 strcat(command, " --output \"");
                 strcat(command, output);
                 strcat(command, "\"");
+                //printf("command: %s\n", command);
                 int ret = system(command);
                 if (!keep_asm) remove(asm_output);
 

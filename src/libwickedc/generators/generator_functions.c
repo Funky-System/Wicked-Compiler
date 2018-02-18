@@ -3,8 +3,65 @@
 
 void generate_default_params(generator_state_t *state, mpc_ast_t *ast);
 
+void generate_syscall(generator_state_t *state, mpc_ast_t *ast, const char* prefix) {
+    assert(0 == strcmp("function|>", ast->tag));
+    assert(strcmp(ast->children[0]->contents, "syscall") == 0);
+
+    char *name, *alias;
+    if (strcmp(ast->children[1]->tag, "syscallAlias|>") == 0) {
+        alias = ast->children[1]->children[1]->contents;
+        name = ast->children[2]->contents;
+    } else {
+        name = ast->children[1]->contents;
+        alias = name;
+    }
+    append_output(state,"# Syscall name: %s%s\n", prefix, name);
+    append_output(state,"jmp @%s%s__end\n", prefix, name);
+    append_output(state,"%s%s: \n", prefix, name);
+
+    append_debug_enterscope(state, prefix, name);
+    enter_scope(state, name, NULL, NULL);
+
+    mpc_ast_t *args = ast->children[3];
+    if (strcmp(args->tag, "args|>") != 0) {
+        args = ast->children[4];
+    }
+
+    int num_params = 0;
+    for (int i = 0; i < args->children_num; i++) {
+        if (strcmp(args->children[i]->tag, "arg|>") == 0) {
+            num_params++;
+        }
+    }
+
+    append_output(state,"args.accept %d\n", num_params);
+
+    if (num_params > 0) {
+        generate_default_params(state, args);
+    }
+
+    for (int i = 0; i < num_params; i++) {
+        append_output(state, "ld.arg %d\n", i);
+    }
+    append_output(state,"syscall.byname \"%s\"\n", alias);
+    append_output(state, "ajs -%d\n", num_params);
+
+    append_output(state,"args.cleanup\n");
+    append_debug_leavescope(state);
+    append_output(state,"ret\n");
+    append_output(state,"@%s%s__end: ", prefix, name);
+    append_output(state, "\n");
+    leave_scope(state);
+}
+
+
 void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* prefix) {
     assert(0 == strcmp("function|>", ast->tag));
+
+    if (strcmp(ast->children[0]->contents, "syscall") == 0) {
+        generate_syscall(state, ast, prefix);
+        return;
+    }
 
     char *name = ast->children[1]->contents;
 

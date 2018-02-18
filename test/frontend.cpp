@@ -96,6 +96,7 @@ CPU_State compile_and_run(const char *wckd_code) {
 
     memory_destroy(&memory);
     free(main_memory);
+    cpu_destroy(&state);
 
     return state;
 }

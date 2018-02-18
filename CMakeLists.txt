@@ -3,6 +3,8 @@ project(wickedc)
 
 set(CMAKE_C_STANDARD 11)
 
+include(ExternalProject)
+
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_command(
@@ -34,6 +36,8 @@ target_link_libraries(wickedc-bin wickedc)
 set_target_properties(wickedc-bin PROPERTIES OUTPUT_NAME wickedc)
 
 file(COPY include DESTINATION ${CMAKE_BINARY_DIR})
+
+install(TARGETS wickedc-bin DESTINATION bin)
 
 enable_testing()
 add_subdirectory(test)
