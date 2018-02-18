@@ -7,6 +7,8 @@ void generate_return(generator_state_t *state, const mpc_ast_t *ast);
 void generate_continue(generator_state_t *state, mpc_ast_t *ast);
 void generate_break(generator_state_t *state, mpc_ast_t *ast);
 
+void generate_asm(generator_state_t *state, const mpc_ast_t *ast);
+
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     assert(0 == strcmp("stmt|>", ast->tag));
 
@@ -15,12 +17,7 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
     if (strcmp("return", ast->children[0]->contents) == 0) {
         generate_return(state, ast);
     } else if (strcmp(ast->children[0]->tag, "asm|>") == 0) {
-        char code[strlen(ast->children[0]->children[1]->contents) + 1];
-        strcpy(code, ast->children[0]->children[1]->contents);
-        code[strlen(code) - 1] = '\0';
-        char* verbatim = str_replace(code + 1, "\\\"", "\"");
-        append_output(state,"%s\n", verbatim);
-        free(verbatim);
+        generate_asm(state, ast);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "continue") == 0) {
         generate_continue(state, ast);
     } else if (strcmp(ast->children[0]->tag, "string") == 0 && strcmp(ast->children[0]->contents, "break") == 0) {
@@ -45,6 +42,16 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
         append_output(state, "pop\n");
     }
 
+}
+
+void generate_asm(generator_state_t *state, const mpc_ast_t *ast) {
+    char code[strlen(ast->children[0]->children[1]->contents) + 1];
+    strcpy(code, ast->children[0]->children[1]->contents);
+    code[strlen(code) - 1] = '\0';
+    char* verbatim = str_replace(code + 1, "\\\"", "\"");
+
+    append_output(state,"%s\n", verbatim);
+    free(verbatim);
 }
 
 void generate_return(generator_state_t *state, const mpc_ast_t *ast) {
