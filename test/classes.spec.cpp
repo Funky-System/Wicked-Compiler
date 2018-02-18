@@ -200,34 +200,35 @@ TEST(Classes, Prototyping) {
     compile_and_run(raw_str);
 }
 
-//TEST(Classes, ToString) {
-//    auto raw_str = R"wckd(
-//        import testlib
-//
-//        class B
-//            var b_var = 1
-//            function string()
-//                return "<" + this.b_var + ">"
-//            end
-//        end
-//
-//        class A extends B
-//            var a_var = 1
-//            function string()
-//                return super + "<" + this.a_var + ">"
-//            end
-//        end
-//
-//        var b = new B
-//        b.b_var = 13
-//        testlib.assert(b.string() == "<13>")
-//        testlib.assert(b.string() == "<13>")
-//        var a = new A
-//        a.b_var = 14
-//        a.a_var = 11
-//        testlib.assert(a.string() == "<14><11>")
-//
-//    )wckd";
-//
-//    compile_and_run(raw_str);
-//}
+TEST(Classes, ToString) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        class B
+            var b_var = 1
+            function string()
+                return "<" + this.b_var + ">"
+            end
+        end
+
+        class A extends B
+            var a_var = 1
+            function string()
+                return super + "<" + this.a_var + ">"
+            end
+        end
+
+        var b = new B
+        b.b_var = 13
+        testlib.assert(b.string() == "<13>")
+        testlib.assert(b.string() == "<13>")
+        var a = new A
+        a.b_var = 14
+        a.a_var = 11
+        # 1 because A.string references super, sho a.b_var should be ignored
+        testlib.assert(a.string() == "<1><11>", a.string())
+
+    )wckd";
+
+    compile_and_run(raw_str);
+}
