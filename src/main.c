@@ -6,6 +6,7 @@
 #define OPTPARSE_IMPLEMENTATION
 #define OPTPARSE_API static
 #include "optparse.h"
+#include "version.h"
 
 int main(int argc, char **argv) {
     struct optparse_long longopts[] = {
@@ -16,6 +17,7 @@ int main(int argc, char **argv) {
             {"assembler", '.', OPTPARSE_REQUIRED},
             {"keep-asm", 'K', OPTPARSE_NONE},
             {"debug", 'd', OPTPARSE_OPTIONAL},
+            {"version", 'v', OPTPARSE_NONE},
             {0}
     };
 
@@ -69,6 +71,10 @@ int main(int argc, char **argv) {
                 break;
             case 'd': // debug
                 debug = options.optarg ? (int)strtol(options.optarg, NULL, 0) : 1;
+                break;
+            case 'v':
+                printf("Funky Wicked Compiler version %d.%d.%d\nBuilt on %s %s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, __DATE__, __TIME__);
+                return 0;
                 break;
             case '?':
             default:

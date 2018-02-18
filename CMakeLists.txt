@@ -31,7 +31,7 @@ add_library(wickedc src/libwickedc/mpc/mpc.c
         src/libwickedc/generators/generator_modules.c
         src/libwickedc/generators/generator_enum.c
         src/libwickedc/string_functions.c)
-add_executable(wickedc-bin src/main.c)
+add_executable(wickedc-bin src/main.c src/version.h)
 target_link_libraries(wickedc-bin wickedc)
 set_target_properties(wickedc-bin PROPERTIES OUTPUT_NAME wickedc)
 
