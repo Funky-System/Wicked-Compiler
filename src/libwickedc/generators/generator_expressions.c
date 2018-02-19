@@ -196,9 +196,9 @@ void generate_prec16(generator_state_t *state, mpc_ast_t *ast) {
     for (int i = ast->children_num - 2; i >= 0; i--) {
         char *oper = ast->children[i]->contents;
         if (strcmp(oper, "!") == 0) {
-            append_output(state,"not\n"); // TODO: implement proper logical not
-        } else if (strcmp(oper, "~") == 0) {
             append_output(state,"not\n");
+        } else if (strcmp(oper, "~") == 0) {
+            append_output(state,"not.bitwise\n");
         } else if (strcmp(oper, "+") == 0) {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is not implemented yet\n", state->filename, ast->children[i]->state.row+1,
                     ast->children[i]->state.col, ast->children[i]->contents);

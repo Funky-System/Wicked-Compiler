@@ -33,6 +33,22 @@ TEST(Maps, Multiline) {
     compile_and_run(raw_str);
 }
 
+TEST(Maps, Empty) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        var map = {
+
+        }
+
+        var map2 = {}
+
+        testlib.assert(map["A"]== empty)
+    )wckd";
+
+    compile_and_run(raw_str);
+}
+
 TEST(Maps, BasicStore) {
     auto raw_str = R"wckd(
         import testlib

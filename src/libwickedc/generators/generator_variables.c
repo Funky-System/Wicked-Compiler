@@ -42,7 +42,11 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
                     }
 
                     int d = depth;
-                    while (d > 0) strcat(scoped_ident, "^."), d--;
+                    while (d > 0) {
+                        scoped_ident = realloc(scoped_ident, strlen(scoped_ident) + 3 + strlen(ident));
+                        strcat(scoped_ident, "^.");
+                        d--;
+                    }
 
                     strcat(scoped_ident, ident);
                     if (symbol_table_hashmap_get(&state->symbol_table, scoped_ident) == NULL) {

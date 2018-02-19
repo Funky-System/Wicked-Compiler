@@ -39,6 +39,28 @@ TEST(If, BasicIfElseStatement) {
     compile_and_run(raw_str);
 }
 
+TEST(If, VarInElse) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        function ss()
+            var i
+            if 1 == 3 then
+                testlib.assert(false)
+            else
+                var i_tmp = i
+                testlib.assert(true)
+            end
+        end
+
+        ss()
+
+
+    )wckd";
+
+    compile_and_run(raw_str);
+}
+
 TEST(If, Oneliner) {
     auto raw_str = R"wckd(
         import testlib

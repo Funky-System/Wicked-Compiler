@@ -9,8 +9,3 @@ function arrayLength()
     "
     return length
 end
-ld.int 100
-ld.str "Hoi, dit is een test"ld.int 100
-                             ld.str "Hoi, dit is een test"jhld.int 100
-                                                            ld.str "Hoi, dit is een test"ld.int 100
-                                                                                         ld.str "Hoi, dit is een test"jdsklcj
