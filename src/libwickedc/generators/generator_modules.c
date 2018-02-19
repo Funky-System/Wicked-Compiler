@@ -129,6 +129,11 @@ const char* class_get_name(mpc_ast_t *ast) {
 }
 
 const char* function_get_name(mpc_ast_t *ast) {
+    if (strcmp(ast->children[0]->contents, "syscall") == 0) {
+        if (strcmp(ast->children[1]->tag, "syscallAlias|>") == 0) {
+            return ast->children[2]->contents;
+        }
+    }
     return ast->children[1]->contents;
 }
 

@@ -31,7 +31,9 @@ void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast) {
             exit(EXIT_FAILURE);
         }
 
+        append_output(state, "ld.stack -2\nst.reg %%r0\n");
         append_output(state, "st.arrelem\n");
+        append_output(state, "ld.reg %%r0\n"); // to recover the expression result
     } else {
         if (strcmp(ast->children[1]->tag, "exp|>") == 0) {
             generate_exp(state, ast->children[1]);
@@ -54,5 +56,23 @@ void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast) {
             exit(EXIT_FAILURE);
         }
 
+    }
+}
+
+void generate_mapInit(generator_state_t *state, mpc_ast_t *ast) {
+    assert(0 == strcmp("mapInit|>", ast->tag));
+
+    append_output(state, "ld.map\n");
+
+    int num = 0;
+    for (int i = 0; i < ast->children_num; i++) {
+        if (strcmp(ast->children[i]->tag, "mapInitItem|>") != 0) {
+            continue;
+        }
+        num++;
+        generate_exp(state, ast->children[i]->children[2]);
+        append_output(state, "ld.stack -1\n"); // the map
+        generate_exp(state, ast->children[i]->children[0]);
+        append_output(state, "st.mapitem.pop\n"); // the map
     }
 }

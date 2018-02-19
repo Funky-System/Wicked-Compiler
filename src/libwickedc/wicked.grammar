@@ -13,12 +13,16 @@ funCall     : '(' <exp>? (',' <exp>)* ')' ;
 methodCall  : <ident> <funCall> ;
 new         : "new" <ident> ('.' <ident>)* <funCall>? ;
 
+mapInitItem : (<exp> ':' <exp>) ;
+mapInit     : "{"<eos>* ( <mapInitItem> <eos>* ( ',' <eos>* <mapInitItem> <eos>* )* )? "}" ;
+
 factor    : '(' <exp> ')'
           | <float>
           | <int>
           | <character>
           | <stringlit>
           | <arrayInit>
+          | <mapInit>
           | <new>
           | "prototypeof" <ident> ('.' <ident>)*
           ;
@@ -110,8 +114,8 @@ classDecl  : "static"? ( <function> | <classVar> ) ;
 extends    : "extends" <ident> ('.' <ident>)* ;
 class      : "class" <ident> <extends>? <eos> (<classDecl> | <eos>)* "end" <eos> ;
 
-enumDecl   : <ident> ( '=' <int> )? ;
-enum       : "enum" <ident> <eos> <enumDecl>? (',' <eos>? <enumDecl> <eos>?)* "end" <eos> ;
+enumDecl   : <ident> ( '=' <int> )? | <eos> ;
+enum       : "enum" <ident> <eos>* <enumDecl> (',' <eos>* <enumDecl> <eos>*)* "end" <eos> ;
 
 exportableFunction : "export"? <function> ;
 exportableClass    : "export"? <class> ;

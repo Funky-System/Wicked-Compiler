@@ -108,16 +108,16 @@ int main(int argc, char **argv) {
                 strcat(command, "\"");
                 //printf("command: %s\n", command);
                 int ret = system(command);
-                if (!keep_asm) remove(asm_output);
 
                 free(asm_output);
                 free(command);
 
                 if (ret == 0) {
+                    if (!keep_asm) remove(asm_output);
                     // yay!
                     return 0;
                 } else {
-                    return ret;
+                    return 1;
                 }
             }
         }

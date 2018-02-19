@@ -19,6 +19,8 @@ void generate_factor(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ld.str %s\n", ast->children[0]->contents);
         } else if (strcmp(ast->children[0]->tag, "arrayInit|>") == 0) {
             generate_arrayInit(state, ast->children[0]);
+        } else if (strcmp(ast->children[0]->tag, "mapInit|>") == 0) {
+            generate_mapInit(state, ast->children[0]);
         } else if (strcmp(ast->children[0]->tag, "new|>") == 0) {
             generate_new(state, ast->children[0]);
         } else {
