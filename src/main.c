@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
                 debug = options.optarg ? (int)strtol(options.optarg, NULL, 0) : 1;
                 break;
             case 'v':
-                printf("Funky Wicked Compiler version %d.%d.%d\nBuilt on %s %s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, __DATE__, __TIME__);
+                printf("Funky Wicked Compiler version %s.%s.%s\nBuilt on %s %s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, __DATE__, __TIME__);
                 return 0;
                 break;
             case '?':
