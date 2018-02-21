@@ -6,6 +6,7 @@ auto raw_str = R"wckd(
         import testlib
 
         testlib.assert(1 != 3)
+        testlib.assert(1 != "1")
         testlib.assert(4 == 4)
         testlib.assert(5 >= 4)
         testlib.assert(4 >= 4)
