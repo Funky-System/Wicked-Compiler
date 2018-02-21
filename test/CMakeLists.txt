@@ -84,7 +84,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
 
 file(GLOB SRCS *.cpp)
 
-ADD_EXECUTABLE(testwickedc ${SRCS} frontend.cpp frontend.h basic.spec.cpp functions.spec.cpp numerical_expressions.spec.cpp if.spec.cpp classes.spec.cpp strings.spec.cpp arrays.spec.cpp loops.spec.cpp enums.spec.cpp maps.spec.cpp)
+ADD_EXECUTABLE(testwickedc ${SRCS} frontend.cpp frontend.h basic.spec.cpp functions.spec.cpp numerical_expressions.spec.cpp if.spec.cpp classes.spec.cpp strings.spec.cpp arrays.spec.cpp loops.spec.cpp enums.spec.cpp maps.spec.cpp comparisons.spec.cpp)
 
 #add_dependencies(testwickedc funky-as)
 TARGET_LINK_LIBRARIES(testwickedc libgtest libgmock wickedc funky-as funky-vm)
