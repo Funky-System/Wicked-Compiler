@@ -75,8 +75,11 @@ void generate_imports(generator_state_t *state, mpc_ast_t *ast) {
                 append_output(state, "dup\nst.reg %%r0\n");
                 append_output(state, "has.mapitem \"@init\"\n");
                 append_output(state, "brfalse @skip_init_%s\n", name);
-                append_output(state, "ld.reg %%r0\n");
+                append_output(state, "ld.reg %%r0\ndup\n");
                 append_output(state, "ld.mapitem \"@init\"\ncall.pop 0\n");
+                append_output(state, "dup\nst.reg %%r0\n");
+                append_output(state, "has.mapitem \"@init\"\n");
+                append_output(state, "brfalse @skip_init_%s\n", name);
                 append_output(state, "call @import_processor, 0\n");
                 append_output(state, "@skip_init_%s:\n", name);
             } else {
