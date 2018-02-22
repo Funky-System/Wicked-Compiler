@@ -45,7 +45,7 @@ TEST(Loops, For) {
 
         var j = 0
 
-        for i in 1..5 do
+        for i in 1..6 do
             j += i
         end
 

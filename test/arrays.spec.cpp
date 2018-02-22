@@ -57,7 +57,7 @@ TEST(Arrays, Ranges) {
         var array = 1..5
 
         testlib.assert(array[1] == 2)
-        testlib.assert(array[4] == 5)
+        testlib.assert(array[3] == 4)
 
     )wckd";
 

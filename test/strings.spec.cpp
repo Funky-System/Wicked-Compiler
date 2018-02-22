@@ -24,3 +24,14 @@ TEST(Strings, Concatenations) {
 
     compile_and_run(raw_str);
 }
+
+TEST(Strings, Slice) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        testlib.assert("abcd"[0:2] == "ab")
+        testlib.assert("abcd"[2:3] == "c")
+    )wckd";
+
+    compile_and_run(raw_str);
+}
