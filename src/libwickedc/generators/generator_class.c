@@ -58,7 +58,7 @@ void generate_class(generator_state_t *state, mpc_ast_t *ast) {
                             append_output(state, "ld.deref %s\n", name);
                             append_output(state, "st.mapitem \"%s\"\n", varName);
                         } else {
-                            append_output(state, "ld.deref %s\nld.empty\nst.mapitem \"%s\"\n", name, varName);
+                            append_output(state, "ld.empty\nld.deref %s\nst.mapitem \"%s\"\n", name, varName);
                         }
                         append_output(state, "\n");
                     }

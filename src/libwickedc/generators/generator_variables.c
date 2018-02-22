@@ -131,6 +131,9 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
         }
     } else if (type == SYMBOL_TYPE_GLOBAL && strcmp("function|>", ast->tag) == 0) {
         char *ident = ast->children[1]->contents;
+        if (strcmp(ast->children[1]->tag, "syscallAlias|>") == 0) {
+            ident = ast->children[2]->contents;
+        }
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
 
             struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
