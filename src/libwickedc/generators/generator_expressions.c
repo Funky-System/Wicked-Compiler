@@ -363,7 +363,7 @@ void generate_prec10(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"ne.id\n");
         } else if (strcmp(oper, "~==") == 0) {
             append_output(state,"eq\n");
-        } else if (strcmp(oper, "!~=") == 0) {
+        } else if (strcmp(oper, "!~==") == 0) {
             append_output(state,"ne\n");
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
