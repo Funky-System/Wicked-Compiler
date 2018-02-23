@@ -35,3 +35,17 @@ TEST(Strings, Slice) {
 
     compile_and_run(raw_str);
 }
+
+TEST(Strings, FunctionStringSlice) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        function giveString()
+            return "abc"
+        end
+
+        testlib.assert(giveString()[1:3] == "bc")
+    )wckd";
+
+    compile_and_run(raw_str);
+}
