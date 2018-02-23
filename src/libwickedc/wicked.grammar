@@ -76,7 +76,7 @@ expstmt       : <prec01stmt> ;
 
 block     : <stmt>
           | <eos> (<stmt> | <eos>)* "end" ;
-doBlock   : <eos> <stmt>* ("end" | "loop")
+doBlock   : <eos> (<stmt> | <eos>)* ("end" | "loop")
           | <stmt> ("loop")
           ;
 ifBlock   : <eos> (<stmt> | <eos>)* ("end" | "else" <block>)
