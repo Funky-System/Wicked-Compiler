@@ -7,14 +7,14 @@ whitespace : /[ \f\n\r\t\v]*/ ;
 comment   : /#([^\n])*\n/ ;
 eos       : (<comment> | '\n' | ';') ;
 
-arrayInit   : '[' ( <exp> ( ',' <exp> )* )? ']' ;
+arrayInit   : '[' <eos>* ( <exp> <eos>* ( ',' <eos>* <exp> <eos>* )* )? ']' ;
 arrIndex    : '[' (<exp> (':' <exp>)?)? ']' ;
 funCall     : '(' <exp>? (',' <exp>)* ')' ;
 methodCall  : <ident> <funCall> ;
 new         : ("new " | "new\t") <ident> ('.' <ident>)* <funCall>? ;
 
 mapInitItem : (<exp> ':' <exp>) ;
-mapInit     : "{"<eos>* ( <mapInitItem> <eos>* ( ',' <eos>* <mapInitItem> <eos>* )* )? "}" ;
+mapInit     : "{" <eos>* ( <mapInitItem> <eos>* ( ',' <eos>* <mapInitItem> <eos>* )* )? "}" ;
 
 factor    : '(' <exp> ')'
           | <float>

@@ -64,3 +64,19 @@ TEST(Arrays, Ranges) {
     compile_and_run(raw_str);
 }
 
+TEST(Arrays, Multiline) {
+    auto raw_str = R"wckd(
+        import testlib
+
+        var array = [1, 2,
+        3, 8
+        , 9, 10
+        ]
+
+        testlib.assert(array[1] == 2)
+        testlib.assert(array[3] == 8)
+        testlib.assert(array[4] == 9)
+    )wckd";
+
+    compile_and_run(raw_str);
+}

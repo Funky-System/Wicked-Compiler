@@ -113,7 +113,8 @@ int main(int argc, char **argv) {
                 free(command);
 
                 if (ret == 0) {
-                    if (!keep_asm) remove(asm_output);
+                    if (!keep_asm) 
+                        remove(asm_output);
                     // yay!
                     return 0;
                 } else {
