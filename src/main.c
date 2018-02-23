@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
             {"keep-asm", 'K', OPTPARSE_NONE},
             {"debug", 'd', OPTPARSE_OPTIONAL},
             {"version", 'v', OPTPARSE_NONE},
+            {"arch", 'a', OPTPARSE_REQUIRED},
             {0}
     };
 
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
     int assemble = 1;
     char *assembler = "funky-as";
     int keep_asm = 0;
+    char* arch = "32";
     int debug = 1;
 
     optparse_init(&options, argv);
@@ -62,6 +64,9 @@ int main(int argc, char **argv) {
                 break;
             case 'A': // do-not-assemble:
                 assemble = 0;
+                break;
+            case 'a':
+                arch = options.optarg;
                 break;
             case 'K':
                 keep_asm = 1;
@@ -98,14 +103,8 @@ int main(int argc, char **argv) {
             compile_file_to_file(filename, output, debug);
         } else  {
             if (compile_file_to_file(filename, asm_output, debug)) {
-                char *command = malloc(strlen(assembler) + strlen(asm_output) + strlen(output) + 16);
-                strcpy(command, assembler);
-                strcat(command, " \"");
-                strcat(command, asm_output);
-                strcat(command, "\"");
-                strcat(command, " --output \"");
-                strcat(command, output);
-                strcat(command, "\"");
+                char *command = malloc(strlen(assembler) + strlen(asm_output) + strlen(output) + 1024);
+                sprintf(command, "%s \"%s\" --arch %s --output \"%s\"", assembler, asm_output, arch, output);
                 //printf("command: %s\n", command);
                 int ret = system(command);
 
