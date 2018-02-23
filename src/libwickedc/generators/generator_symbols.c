@@ -141,7 +141,7 @@ struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const
         } else {
             *scoped_ident = '\0';
             strncat(scoped_ident, scope, pos - scope + 1);
-            strcat(scoped_ident, scoped_ident);
+            strcat(scoped_ident, ident);
             pos[0] = '\0';
             entry = symbol_table_hashmap_get(&state->symbol_table, scoped_ident);
         }
