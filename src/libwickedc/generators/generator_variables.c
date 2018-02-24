@@ -138,9 +138,8 @@ void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, 
             ident = ast->children[2]->contents;
         }
         if (symbol_table_hashmap_get(&state->symbol_table, ident) == NULL) {
-
             struct symbol_table_entry *e = malloc(sizeof(struct symbol_table_entry));
-            e->name = strdup(ast->children[1]->contents);
+            e->name = strdup(ident);
             e->index = 0;
             e->type = SYMBOL_TYPE_FUNCTION;
             symbol_table_hashmap_put(&state->symbol_table, ident, e);
