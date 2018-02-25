@@ -29,7 +29,7 @@ factor    : '(' <exp> ')'
 
 prec20    : <factor> | <ident> ;
 prec19    : <prec20> ;
-prec18    : <prec19> (<arrIndex> | <funCall>)* ('.' (<methodCall> | <prec18>))* ;
+prec18    : <prec19> (<arrIndex> | <funCall>)* (('.' (<methodCall> | <prec18>)) | <arrIndex> | <funCall>)* ;
 prec17    : <prec18> ( "++" | "--" )* ;
 prec16    : ( "!" | "~" | "+" | "-" | "++" | "--" | "typeof" )* <prec17> ;
 prec15    : <prec16> ( ( "**" ) <exp> )? ;
