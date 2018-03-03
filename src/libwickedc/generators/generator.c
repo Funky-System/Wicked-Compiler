@@ -76,7 +76,7 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
     assert(0 == strcmp("regex", ast->children[ast->children_num - 1]->tag));
 
     int num_globals = 0, num_params = 0;
-    populate_symbol_table(&state, ast, -1, &num_globals, &num_params, SYMBOL_TYPE_GLOBAL);
+    populate_symbol_table(&state, ast, "", &num_globals, &num_params, SYMBOL_TYPE_GLOBAL);
     //printf("symbol table after globals:\n");
     //print_symbol_table(&state);
 

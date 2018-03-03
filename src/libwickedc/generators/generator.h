@@ -58,7 +58,8 @@ struct symbol_table_entry {
 struct symbol_table_entry *get_symbol_from_ident(generator_state_t *state, const char* ident);
 struct symbol_table_entry *get_symbol_from_scopedIdent(generator_state_t *state, mpc_ast_t* identtag);
 void enter_scope(generator_state_t *state, const char* name, const char* continue_label, const char* break_label);
-void leave_scope(generator_state_t *state);
+void enter_scope_with_pos(generator_state_t *state, const char* name, long pos, const char* continue_label, const char* break_label);
+void leave_scope(generator_state_t *state, int cleanup);
 
 void generate_exp(generator_state_t *state, mpc_ast_t *ast);
 void generate_stmt(generator_state_t *state, mpc_ast_t *ast);
@@ -85,7 +86,7 @@ void generate_arrayInit(generator_state_t *state, mpc_ast_t *ast);
 void generate_arrIndex(generator_state_t *state, mpc_ast_t *ast);
 void generate_mapInit(generator_state_t *state, mpc_ast_t *ast);
 
-void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, int depth, int *num_locals, int *num_params,
+void populate_symbol_table(generator_state_t *state, mpc_ast_t *ast, const char* scope, int *num_locals, int *num_params,
                            enum symbol_type type);
 void print_symbol_table(generator_state_t *state);
 

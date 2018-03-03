@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <src/libwickedc/mpc/mpc.h>
 #include "generator.h"
 
 void generate_while(generator_state_t *state, mpc_ast_t *ast) {
@@ -24,16 +25,16 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast) {
     sprintf(endlabel, "@enddo_%d", state->uniqueid++);
     append_output(state,"%s:\n", startlabel);
 
-    enter_scope(state, "^", checklabel, endlabel);
-
     mpc_ast_t *doBlock = ast->children[1];
+    enter_scope_with_pos(state, "^", doBlock->state.pos, checklabel, endlabel);
+
     for (int i = 0; i < doBlock->children_num; i++) {
         if (strcmp("stmt|>", doBlock->children[i]->tag) == 0) {
             generate_stmt(state, doBlock->children[i]);
         } else if (strcmp("block|>", doBlock->children[i]->tag) == 0) {
-            leave_scope(state);
+            //leave_scope(state, 0);
             generate_block(state, doBlock->children[i], checklabel, endlabel);
-            enter_scope(state, "^", checklabel, endlabel);
+            //enter_scope_with_pos(state, "^", doBlock->state.pos, checklabel, endlabel);
         }
     }
 
@@ -45,7 +46,7 @@ void generate_do(generator_state_t* state, mpc_ast_t *ast) {
         append_output(state,"%s:\n", endlabel);
     }
 
-    leave_scope(state);
+    leave_scope(state, 0);
 }
 
 void generate_for(generator_state_t *state, mpc_ast_t *ast) {
@@ -66,9 +67,9 @@ void generate_for(generator_state_t *state, mpc_ast_t *ast) {
 
     append_output(state,"%s:\n", startlabel);
     append_output(state,"ld.stack 0\nld.stack -2\ncmp\nbge %s\n", endlabel);
-    enter_scope(state, "^", inclabel, endlabel);
+    enter_scope_with_pos(state, "^", ast->children[5]->state.pos, inclabel, endlabel);
     struct symbol_table_entry *i = get_symbol_from_ident(state, ast->children[1]->contents);
-    leave_scope(state);
+    leave_scope(state, 0);
     append_output(state,"ld.stack -2\nld.stack -1\nld.arrelem\n");
     if (i->type == SYMBOL_TYPE_LOCAL) {
         append_output(state,"st.local %d\n", i->index);

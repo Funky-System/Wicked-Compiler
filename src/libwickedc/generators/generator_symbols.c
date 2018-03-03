@@ -225,7 +225,14 @@ void enter_scope(generator_state_t *state, const char* name, const char* continu
     }
 }
 
-void leave_scope(generator_state_t *state) {
+void enter_scope_with_pos(generator_state_t *state, const char* name, long pos, const char* continue_label, const char* break_label) {
+    char *scope = malloc(strlen(name) + 64);
+    sprintf(scope, "%s%ld", name, pos);
+    enter_scope(state, scope, continue_label, break_label);
+    free(scope);
+}
+
+void leave_scope(generator_state_t *state, int cleanup) {
     state->num_continue_labels--;
     if (state->continue_labels[state->num_continue_labels] != NULL) {
         free(state->continue_labels[state->num_continue_labels]);
@@ -240,7 +247,7 @@ void leave_scope(generator_state_t *state) {
 
     char *pos = strrchr(state->scope, '.');
     if(pos == NULL) {
-        if (strcmp(state->scope, "^") == 0) {
+        if (state->scope[0] == '^') {
             strcpy(state->scope, "");
             return;
         } else {
@@ -248,9 +255,9 @@ void leave_scope(generator_state_t *state) {
         }
     }
 
-    if (strcmp(pos, ".^") != 0) {
+    if (cleanup) {
         struct hashmap_iter *iter = hashmap_iter(&state->symbol_table);
-        char scope[strlen(state->scope) + 2];
+        char *scope = malloc(strlen(state->scope) + 2);
         strcpy(scope, state->scope);
         strcat(scope, ".");
         while (iter) {
@@ -264,6 +271,7 @@ void leave_scope(generator_state_t *state) {
                 iter = hashmap_iter_next(&state->symbol_table, iter);
             }
         }
+        free(scope);
     }
 
     *pos = '\0';

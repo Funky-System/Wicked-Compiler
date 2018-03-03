@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <src/libwickedc/mpc/mpc.h>
 #include "generator.h"
 
 void generate_if(generator_state_t *state, mpc_ast_t *ast) {
@@ -14,9 +15,9 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
     int elsefound = 0;
     append_output(state,"brfalse %s\n", elselabel);
 
-    enter_scope(state, "^", NULL, NULL);
-
     mpc_ast_t *ifBlock = ast->children[3];
+    enter_scope_with_pos(state, "^", ifBlock->state.pos, NULL, NULL);
+
     for (int i = 0; i < ifBlock->children_num; i++) {
         if (strcmp("stmt|>", ifBlock->children[i]->tag) == 0) {
             // single line if statement
@@ -30,9 +31,9 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"jmp %s\n", endlabel);
             append_output(state,"%s:\n", elselabel);
         } else if (strcmp("block|>", ifBlock->children[i]->tag) == 0) {
-            leave_scope(state);
+            leave_scope(state, 0);
             generate_block(state, ifBlock->children[i], NULL, NULL);
-            enter_scope(state, "^", NULL, NULL);
+            enter_scope_with_pos(state, "^", ifBlock->state.pos, NULL, NULL);
         }
     }
 
@@ -41,5 +42,5 @@ void generate_if(generator_state_t *state, mpc_ast_t *ast) {
     }
     append_output(state,"%s:\n", endlabel);
 
-    leave_scope(state);
+    leave_scope(state, 0);
 }

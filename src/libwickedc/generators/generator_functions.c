@@ -51,7 +51,7 @@ void generate_syscall(generator_state_t *state, mpc_ast_t *ast, const char* pref
     append_output(state,"ret\n");
     append_output(state,"@%s%s__end: ", prefix, name);
     append_output(state, "\n");
-    leave_scope(state);
+    leave_scope(state, 1);
 }
 
 
@@ -86,7 +86,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
         num_locals++; // local for the relative stack pos of the to be return result
     }
 
-    populate_symbol_table(state, ast, 0, &num_locals, &num_params, SYMBOL_TYPE_LOCAL);
+    populate_symbol_table(state, ast, "", &num_locals, &num_params, SYMBOL_TYPE_LOCAL);
     //printf("symbol table after locals for function %s%s:\n", prefix, name);
     //print_symbol_table(state);
     append_output(state,"args.accept %d\n", num_params);
@@ -116,14 +116,14 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
             generate_stmt(state, ast->children[i]);
         } else if (strcmp("string", ast->children[i]->tag) == 0 && strcmp("end", ast->children[i]->contents) == 0) {
             if (state->is_conv_method) {
-            append_output(state, "ld.empty\n");
-            append_output(state, "ld.local 1\n");
-            append_output(state, "ld.int 1\nsub\n");
-            append_output(state, "st.arg.pop\n");
+                append_output(state, "ld.empty\n");
+                append_output(state, "ld.local 1\n");
+                append_output(state, "ld.int 1\nsub\n");
+                append_output(state, "st.arg.pop\n");
             }
 
             append_output(state,"locals.cleanup\nargs.cleanup\nld.int 0\nst.reg %%rr\n");
-            append_debug_leavescope(state);
+            //append_debug_leavescope(state);
             append_output(state,"ret\n");
             append_output(state,"@%s%s__end: ", prefix, name);
             append_output(state,"# end\n");
@@ -131,7 +131,7 @@ void generate_function(generator_state_t *state, mpc_ast_t *ast, const char* pre
     }
 
     append_output(state, "\n");
-    leave_scope(state);
+    leave_scope(state, 1);
     state->is_conv_method = 0;
 }
 

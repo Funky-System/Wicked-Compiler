@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <src/libwickedc/mpc/mpc.h>
 #include "generator.h"
 #include "src/libwickedc/string_functions.h"
 
@@ -86,7 +87,7 @@ void generate_block(generator_state_t *state, mpc_ast_t *ast, const char* contin
     char endLabel[32];
     sprintf(endLabel, "@end_%d", state->uniqueid++);
 
-    enter_scope(state, "^", continue_label, break_label);
+    enter_scope_with_pos(state, "^", ast->state.pos, continue_label, break_label);
 
     for (int i = 0; i < ast->children_num; i++) {
         if (strcmp("stmt|>", ast->children[i]->tag) == 0) {
@@ -96,7 +97,7 @@ void generate_block(generator_state_t *state, mpc_ast_t *ast, const char* contin
         }
     }
 
-    leave_scope(state);
+    leave_scope(state, 0);
 }
 
 void generate_continue(generator_state_t *state, mpc_ast_t *ast) {

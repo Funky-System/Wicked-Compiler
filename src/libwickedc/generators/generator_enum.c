@@ -28,7 +28,7 @@ void generate_enum(generator_state_t *state, mpc_ast_t *ast) {
 
     append_output(state, "\n\n");
 
-    leave_scope(state);
+    leave_scope(state, 0);
 }
 
 
