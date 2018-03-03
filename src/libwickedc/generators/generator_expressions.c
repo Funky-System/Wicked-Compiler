@@ -174,13 +174,19 @@ void generate_prec17(generator_state_t *state, mpc_ast_t *ast) {
     state->exp_state->is_first_member = 1;
     state->exp_state->is_last_member = 0;
 
-    generate_prec18(state, ast->children[ast->children_num - 1]);
-    for (int i = 0; i < ast->children_num - 1; i++) {
+    generate_prec18(state, ast->children[0]);
+    for (int i = 1; i < ast->children_num; i++) {
         char *oper = ast->children[i]->contents;
         if (strcmp(oper, "++") == 0) {
             // TODO
+            fprintf(stderr, "%s:%ld:%ld error: postfix '%s' operator is not supported\n", state->filename, ast->children[i]->state.row+1,
+                    ast->children[i]->state.col, ast->children[i]->contents);
+            exit(EXIT_FAILURE);
         } else if (strcmp(oper, "--") == 0) {
             // TODO
+            fprintf(stderr, "%s:%ld:%ld error: postfix '%s' operator is not supported\n", state->filename, ast->children[i]->state.row+1,
+                    ast->children[i]->state.col, ast->children[i]->contents);
+            exit(EXIT_FAILURE);
         } else {
             fprintf(stderr, "%s:%ld:%ld error: '%s' is an unknown operator\n", state->filename, ast->children[i]->state.row+1,
                     ast->children[i]->state.col, ast->children[i]->contents);
@@ -208,10 +214,19 @@ void generate_prec16(generator_state_t *state, mpc_ast_t *ast) {
             append_output(state,"neg\n");
         } else if (strcmp(oper, "++") == 0) {
             // TODO
+            fprintf(stderr, "%s:%ld:%ld error: prefix '%s' operator is not supported\n", state->filename, ast->children[i]->state.row+1,
+                    ast->children[i]->state.col, ast->children[i]->contents);
+            exit(EXIT_FAILURE);
         } else if (strcmp(oper, "--") == 0) {
             // TODO
+            fprintf(stderr, "%s:%ld:%ld error: postfix '%s' operator is not supported\n", state->filename, ast->children[i]->state.row+1,
+                    ast->children[i]->state.col, ast->children[i]->contents);
+            exit(EXIT_FAILURE);
         } else if (strcmp(oper, "typeof") == 0) {
             // TODO
+            fprintf(stderr, "%s:%ld:%ld error: postfix '%s' operator is not supported\n", state->filename, ast->children[i]->state.row+1,
+                    ast->children[i]->state.col, ast->children[i]->contents);
+            exit(EXIT_FAILURE);
         } else if (strcmp(oper, "prototypeof") == 0) {
             if (strcmp(ast->contents, "string") == 0) {
                 append_output(state,"ld.boxingproto VM_TYPE_STRING\n");
