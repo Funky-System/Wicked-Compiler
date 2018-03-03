@@ -85,9 +85,14 @@ char* generate(const char *filename_hint, int debug, mpc_ast_t *ast) {
 
         if (strcmp("imports|>", part->tag) == 0) generate_imports(&state, part);
         if (strcmp("exports|>", part->tag) == 0) generate_exports(&state, part);
-        if (strcmp("exportableFunction|>", part->tag) == 0) generate_exportable_function(&state, part);
         if (strcmp("exportableClass|>", part->tag) == 0) generate_exportable_class(&state, part);
         if (strcmp("exportableEnum|>", part->tag) == 0) generate_exportable_enum(&state, part);
+    }
+
+    for (int i = 1; i < (ast->children_num - 1); i++) {
+        mpc_ast_t *part = ast->children[i];
+
+        if (strcmp("exportableFunction|>", part->tag) == 0) generate_exportable_function(&state, part);
         if (strcmp("stmt|>", part->tag) == 0) generate_stmt(&state, part);
     }
 

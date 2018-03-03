@@ -7,6 +7,6 @@
 
 #define VERSION_MAJOR "2018"
 #define VERSION_MINOR "1"
-#define VERSION_REVISION "2"
+#define VERSION_REVISION "3"
 
 #endif //WICKEDC_VERSION_H
