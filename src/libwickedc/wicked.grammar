@@ -80,7 +80,7 @@ doBlock   : <eos> (<stmt> | <eos>)* ("end" | "loop")
           | <stmt> ("loop")
           ;
 ifBlock   : <eos> (<stmt> | <eos>)* ("end" | "else" <block>)
-          | <stmt> ("else" <block>)?
+          | <stmt>
           ;
 
 decl      : <ident> ( '=' <exp>)? ;

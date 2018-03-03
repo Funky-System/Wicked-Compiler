@@ -73,35 +73,22 @@ TEST(If, Oneliner) {
     compile_and_run(raw_str);
 }
 
-TEST(If, OnelinerElse) {
-    auto raw_str = R"wckd(
-        import testlib
-
-        if 1 == 3 then testlib.assert(false)
-        else testlib.assert(true)
-
-        if 1 == 1 then testlib.assert(true)
-        else testlib.assert(false)
-
-        if 1 == 3 then testlib.assert(false) ; else testlib.assert(true)
-
-        if 1 == 1 then testlib.assert(true) ; else testlib.assert(false)
-
-    )wckd";
-
-    compile_and_run(raw_str);
-}
-
 TEST(If, ElseIf) {
     auto raw_str = R"wckd(
         import testlib
 
-        if 1 == 3 then testlib.assert(false)
-        else if 1 == 1 then testlib.assert(true)
-        else testlib.assert(false)
+        if 1 == 3 then
+            testlib.assert(false)
+        else if 1 == 1 then
+            testlib.assert(true)
+        else
+            testlib.assert(false)
+        end
 
-        if 1 == 1 then testlib.assert(true)
-        else if 1 == 1 then testlib.assert(false)
+        if 1 == 1 then
+            testlib.assert(true)
+        else if 1 == 1 then
+            testlib.assert(false)
         else
             testlib.assert(false)
         end
@@ -144,6 +131,21 @@ TEST(If, ConditionalExecution) {
         truthy_should_run() || truthy_should_NOT_run() || truthy_should_NOT_run()
         falsy_should_run() || truthy_should_run() || truthy_should_NOT_run()
         falsy_should_run() && falsy_should_NOT_run() || falsy_should_run()
+
+    )wckd";
+
+    compile_and_run(raw_str);
+}
+
+TEST(If, SingleLine) {
+    auto raw_str = R"wckd(
+    import testlib
+
+    function bla()
+        if true then return "abc"
+    end
+
+    testlib.assert(bla() == "abc")
 
     )wckd";
 
