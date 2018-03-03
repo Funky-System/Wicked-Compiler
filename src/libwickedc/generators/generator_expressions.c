@@ -487,6 +487,24 @@ void generate_prec04(generator_state_t *state, mpc_ast_t *ast) {
     }
 }
 
+void generate_prec04b(generator_state_t *state, mpc_ast_t *ast) {
+//    assert(0 == strcmp("prec04|>", ast->tag));
+
+    generate_prec04(state, ast->children[0]);
+
+    if (ast->children_num > 1 && strcmp(ast->children[1]->contents, "?") == 0) {
+        char elselabel[19], endlabel[19];
+        sprintf(elselabel, "@else_%d", state->uniqueid);
+        sprintf(endlabel, "@endif_%d", state->uniqueid++);
+        append_output(state,"brfalse %s\n", elselabel);
+        generate_exp(state, ast->children[2]);
+        append_output(state,"jmp %s\n", endlabel);
+        append_output(state,"%s:\n", elselabel);
+        generate_exp(state, ast->children[4]);
+        append_output(state,"%s:\n", endlabel);
+    }
+}
+
 // Assignment operators
 void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
 //    assert(0 == strcmp("prec03|>", ast->tag));
@@ -495,8 +513,8 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
         state->exp_state->has_lvalue++;
         if (strcmp(ast->children[1]->contents, "=") != 0) {
             // if this is not a regular assignment, but a compund OP=
-            if (tag_startswith(ast->children[0], "prec04")) {
-                generate_prec04(state, ast->children[0]);
+            if (tag_startswith(ast->children[0], "prec04b")) {
+                generate_prec04b(state, ast->children[0]);
             } else if (tag_startswith(ast->children[0], "ident")) {
                 state->exp_state->is_first_member = 1;
                 generate_ident(state, ast->children[0]);
@@ -537,8 +555,8 @@ void generate_prec03(generator_state_t *state, mpc_ast_t *ast) {
     // now, the new value for lhs is on the stack
 
     // lhs
-    if (tag_startswith(ast->children[0], "prec04")) {
-        generate_prec04(state, ast->children[0]);
+    if (tag_startswith(ast->children[0], "prec04b")) {
+        generate_prec04b(state, ast->children[0]);
     } else if (tag_startswith(ast->children[0], "ident")) {
         state->exp_state->is_first_member++;
         state->exp_state->is_last_member++;

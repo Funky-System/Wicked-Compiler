@@ -44,7 +44,8 @@ prec07    : <prec08> ( "|" <prec08> )* ;
 prec06    : <prec07> ( "&&" <prec07> )* ;
 prec05    : <prec06> ( "||" <prec06> )* ;
 prec04    : <prec05> ( ".." <prec05> )* ;
-prec03    : <prec04> ( ( "=" | "+=" | "-=" | "**=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="| "|=" ) <exp> )? ;
+prec04b   : <prec04> ( '?' <exp> ':' <exp> )? ;
+prec03    : <prec04b> ( ( "=" | "+=" | "-=" | "**=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="| "|=" ) <exp> )? ;
 prec02    : <prec03> ;
 prec01    : <prec02> ( "<.>" <prec02>)* ;
 exp       : <prec01> ;
@@ -68,7 +69,8 @@ prec07stmt    : <prec08stmt> ( "|" <prec08> )* ;
 prec06stmt    : <prec07stmt> ( "&&" <prec07> )* ;
 prec05stmt    : <prec06stmt> ( "||" <prec06> )* ;
 prec04stmt    : <prec05stmt> ( ".." <prec05> )* ;
-prec03stmt    : <prec04stmt> ( ( "=" | "+=" | "-=" | "**=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="| "|=" ) <exp> )?
+prec04bstmt   : <prec04stmt> ( '?' <exp> ':' <exp> )? ;
+prec03stmt    : <prec04bstmt> ( ( "=" | "+=" | "-=" | "**=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="| "|=" ) <exp> )?
               | <ident> ( "=" | "+=" | "-=" | "**=" | "*=" | "/=" | "%=" | "<<=" | ">>=" | "&=" | "^="| "|=" ) <exp> ;
 prec02stmt    : <prec03stmt> ;
 prec01stmt    : <prec02stmt> ( "<,>" <prec02>)* ;
