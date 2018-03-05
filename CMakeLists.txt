@@ -8,14 +8,14 @@ include(ExternalProject)
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h
-        COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tools/generate_parser.sh grammar ${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h"
+        COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tools/generate_parser.sh" grammar "${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar" "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar"
 )
 
 add_library(wickedc src/libwickedc/mpc/mpc.c
-        ${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c
-        ${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c
+        "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c"
+        "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c"
         src/libwickedc/hashmap.c
         src/libwickedc/compiler.c
         src/libwickedc/generators/generator.c
