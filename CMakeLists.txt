@@ -46,7 +46,13 @@ file(COPY include DESTINATION ${CMAKE_BINARY_DIR})
 
 install(TARGETS wickedc-bin DESTINATION bin)
 
-enable_testing()
-add_subdirectory(test)
+if (NOT DEFINED TESTING_ENABLED)
+        set(TESTING_ENABLED true)
+endif()
+
+if (TESTING_ENABLED)
+        enable_testing()
+        add_subdirectory(test)
+endif()
 
 add_subdirectory(stdlib)
