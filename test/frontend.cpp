@@ -64,15 +64,15 @@ void load_testlib(CPU_State *state) {
 CPU_State compile_and_run(const char *wckd_code) {
     char *fasm = compile_string_to_string("<test:wckd>", wckd_code, 0);
     EXPECT_TRUE(fasm != NULL);
-    if (fasm == NULL) return (CPU_State) {0};
+    if (fasm == NULL) return CPU_State {0};
 
     funky_bytecode_t funk = funky_assemble("<test:fasm>", fasm, 0);
     free(fasm);
 
     EXPECT_TRUE(funk.bytes != NULL);
-    if (funk.bytes == NULL) return (CPU_State) {0};
+    if (funk.bytes == NULL) return CPU_State {0};
     EXPECT_GT(funk.length, 0);
-    if (funk.length == 0) return (CPU_State) {0};
+    if (funk.length == 0) return CPU_State {0};
 
     auto main_memory = (byte_t *) calloc(VM_MEMORY_LIMIT, 1);
     Memory memory;

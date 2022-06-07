@@ -7,10 +7,17 @@ include(ExternalProject)
 
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
+set(BASH_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(BASH_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+if(MSVC)
+        execute_process(COMMAND wsl wslpath "${BASH_SOURCE_DIR}" OUTPUT_VARIABLE BASH_SOURCE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND wsl wslpath "${BASH_BINARY_DIR}" OUTPUT_VARIABLE BASH_BINARY_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 add_custom_command(
         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h"
-        COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tools/generate_parser.sh" grammar "${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar" "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c" "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.h"
+        COMMAND bash "${BASH_SOURCE_DIR}/tools/generate_parser.sh" grammar "${BASH_SOURCE_DIR}/src/libwickedc/wicked.grammar" "${BASH_BINARY_DIR}/grammar.gen.c" "${BASH_BINARY_DIR}/parser.gen.c" "${BASH_BINARY_DIR}/parser.gen.h"
         DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/libwickedc/wicked.grammar"
+        VERBATIM
 )
 
 add_library(wickedc src/libwickedc/mpc/mpc.c

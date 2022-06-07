@@ -46,10 +46,12 @@ void generate_stmt(generator_state_t *state, mpc_ast_t *ast) {
 }
 
 void generate_asm(generator_state_t *state, const mpc_ast_t *ast) {
-    char code[strlen(ast->children[0]->children[1]->contents) + 1];
+    size_t len = strlen(ast->children[0]->children[1]->contents) + 1;
+    char* code = malloc(len);
     strcpy(code, ast->children[0]->children[1]->contents);
     code[strlen(code) - 1] = '\0';
     char* verbatim = str_replace(code + 1, "\\\"", "\"");
+    free(code);
 
     append_output(state,"%s\n", verbatim);
     free(verbatim);

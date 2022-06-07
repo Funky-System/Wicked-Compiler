@@ -21,7 +21,8 @@ void cleanup(generator_state_t *state) {
 }
 
 void append_output(generator_state_t *state, const char *format, ...) {
-    char buffer[strlen(format) + 2048];
+    size_t len = strlen(format) + 2048;
+    char *buffer = malloc(len);
 
     va_list args;
     va_start(args, format);
@@ -30,6 +31,7 @@ void append_output(generator_state_t *state, const char *format, ...) {
 
     state->output = realloc(state->output, strlen(state->output) + strlen(buffer) + 1);
     strcat(state->output, buffer);
+    free(buffer);
 }
 
 void append_debug_setcontext(generator_state_t *state, mpc_ast_t *ast) {
