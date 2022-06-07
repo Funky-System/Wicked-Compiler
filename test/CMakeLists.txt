@@ -2,7 +2,9 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads REQUIRED)
 
-set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 # Enable ExternalProject CMake module
 include(ExternalProject)
