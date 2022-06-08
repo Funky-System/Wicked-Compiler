@@ -2,8 +2,9 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads REQUIRED)
 
-if(NOT CMAKE_BUILD_TYPE)
-set(CMAKE_BUILD_TYPE Debug)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+    message("CMAKE_BUILD_TYPE not set, autosetting to Release")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default build type: Release" FORCE)
 endif()
 
 # Enable ExternalProject CMake module
@@ -32,12 +33,12 @@ if (NOT TARGET funky-as)
     ExternalProject_Get_Property(EXT_funky-as source_dir binary_dir)
     add_library(funky-as IMPORTED STATIC GLOBAL)
     add_dependencies(funky-as EXT_funky-as)
-    if (NOT MSVC)
-        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-as.a"
+    if (MSVC)
+        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-as.lib"
                 "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
     else()
-        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-as.lib"
-        "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-as.a"
+                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
     endif()
     include_directories("${source_dir}/include")
 endif()
@@ -54,12 +55,12 @@ if (NOT TARGET funky-vm)
     ExternalProject_Get_Property(EXT_funky-vm source_dir binary_dir)
     add_library(funky-vm IMPORTED STATIC GLOBAL)
     add_dependencies(funky-vm EXT_funky-vm)
-    if (NOT MSVC)
-        set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-vm.a"
-                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
-    else()
+    if (MSVC)
         set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-vm.lib"
-        "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+            "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+    else()
+        set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-vm.a"
+                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
     endif()
     include_directories("${source_dir}/include")
 endif()
@@ -75,10 +76,10 @@ ADD_EXECUTABLE(testwickedc ${SRCS} frontend.cpp frontend.h basic.spec.cpp functi
 TARGET_LINK_LIBRARIES(testwickedc gtest_main wickedc funky-as funky-vm)
 
 include(GoogleTest)
-gtest_discover_tests(testwickedc)
+gtest_discover_tests(testwickedc DISCOVERY_MODE PRE_TEST)
 
 if (NOT MSVC)
-    configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/testlib.fasm COPYONLY)
+    configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
 else()
     configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
 endif()

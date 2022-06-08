@@ -5,6 +5,10 @@ set(CMAKE_C_STANDARD 11)
 
 include(ExternalProject)
 
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default build type: Release" FORCE)
+endif()
+
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 set(BASH_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
