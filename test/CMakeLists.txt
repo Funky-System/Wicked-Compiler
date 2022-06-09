@@ -37,9 +37,13 @@ if (NOT TARGET funky-as)
         set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-as.lib"
                 "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
     else()
-        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-as.a"
-                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
-    endif()
+        if (GENERATOR_IS_MULTI_CONFIG)
+            set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-as.a"
+                    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        else()
+            set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-as.a"
+                    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        endif()
     include_directories("${source_dir}/include")
 endif()
 
@@ -59,8 +63,13 @@ if (NOT TARGET funky-vm)
         set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-vm.lib"
             "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
     else()
-        set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-vm.a"
-                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        if (GENERATOR_IS_MULTI_CONFIG)
+            set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-vm.a"
+                    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        else()
+            set_target_properties(funky-vm PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-vm.a"
+                    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        endif()
     endif()
     include_directories("${source_dir}/include")
 endif()
@@ -81,5 +90,9 @@ gtest_discover_tests(testwickedc DISCOVERY_MODE PRE_TEST)
 if (NOT MSVC)
     configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
 else()
-    configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
+    if (GENERATOR_IS_MULTI_CONFIG)
+        configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
+    else()
+        configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/testlib.fasm COPYONLY)
+    endif()
 endif()
