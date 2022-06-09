@@ -88,7 +88,7 @@ TARGET_LINK_LIBRARIES(testwickedc gtest_main wickedc funky-as funky-vm)
 include(GoogleTest)
 gtest_discover_tests(testwickedc DISCOVERY_MODE PRE_TEST)
 
-if (NOT MSVC)
+if (MSVC)
     configure_file(testlib.fasm ${CMAKE_BINARY_DIR}/test/${CMAKE_BUILD_TYPE}/testlib.fasm COPYONLY)
 else()
     if (GENERATOR_IS_MULTI_CONFIG)
