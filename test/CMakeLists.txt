@@ -44,6 +44,7 @@ if (NOT TARGET funky-as)
             set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-as.a"
                     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
         endif()
+    endif()
     include_directories("${source_dir}/include")
 endif()
 
