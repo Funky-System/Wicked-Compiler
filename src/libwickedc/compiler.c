@@ -1,3 +1,5 @@
+#include <errno.h>
+
 #include "mpc/mpc.h"
 
 #include "parser.gen.h"
