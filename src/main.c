@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <errno.h>
 
 #include "wickedc/wickedc.h"
 #include "funkyas/funkyas.h"
