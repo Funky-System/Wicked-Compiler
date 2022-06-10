@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include "wickedc/wickedc.h"
+#include "funkyas/funkyas.h"
 
 #define OPTPARSE_IMPLEMENTATION
 #define OPTPARSE_API static
@@ -17,8 +18,6 @@ int main(int argc, char **argv) {
             {"simulate", 'S', OPTPARSE_NONE},
             {"output", 'o', OPTPARSE_REQUIRED},
             {"do-not-assemble", 'A', OPTPARSE_NONE},
-            {"assembler", '.', OPTPARSE_REQUIRED},
-            {"keep-asm", 'K', OPTPARSE_NONE},
             {"only-if-newer", 'N', OPTPARSE_NONE},
             {"debug", 'd', OPTPARSE_OPTIONAL},
             {"verbose", 'V', OPTPARSE_NONE},
@@ -36,8 +35,6 @@ int main(int argc, char **argv) {
     strcat(asm_output, ".fasm");
     int print_parse_tree = 0, print_parse_tree_folded = 1;
     int assemble = 1;
-    char *assembler = "funky-as";
-    int keep_asm = 0;
     int verbose = 0;
     int only_if_newer = 0;
     char* arch = "32";
@@ -77,12 +74,6 @@ int main(int argc, char **argv) {
                 break;
             case 'a':
                 arch = options.optarg;
-                break;
-            case 'K':
-                keep_asm = 1;
-                break;
-            case '.': // assembler:
-                assembler = options.optarg;
                 break;
             case 'd': // debug
                 debug = options.optarg ? (int)strtol(options.optarg, NULL, 0) : 1;
@@ -125,26 +116,26 @@ int main(int argc, char **argv) {
         }
 
         if (!assemble) {
-            compile_file_to_file(filename, output, debug);
-        } else  {
-            if (compile_file_to_file(filename, asm_output, debug)) {
-                char *command = malloc(strlen(assembler) + strlen(asm_output) + strlen(output) + 1024);
-                sprintf(command, "%s \"%s\" --arch %s --output \"%s\"", assembler, asm_output, arch, output);
-                //printf("command: %s\n", command);
-                int ret = system(command);
+            compile_file_to_file(filename, asm_output, debug);
+            free(asm_output);
+            return 0;
+        } else {
+            char *asm = compile_file_to_string(filename, debug);
+            funky_bytecode_t bc = funky_assemble(filename, asm, !debug);
 
-                free(asm_output);
-                free(command);
-
-                if (ret == 0) {
-                    if (!keep_asm) 
-                        remove(asm_output);
-                    // yay!
-                    return 0;
-                } else {
-                    return 1;
-                }
+            FILE *outFile = fopen(output, "wb");
+            if (outFile == NULL) {
+                int errnum = errno;
+                fprintf(stderr, "Error: Could not write to file %s\n", output);
+                fprintf(stderr, "%s\n", strerror(errnum));
+                exit(EXIT_FAILURE);
             }
+            fwrite(bc.bytes, sizeof(byte_t), bc.length, outFile);
+            fclose(outFile);
+            free(bc.bytes);
+            free(asm);
+
+            return 0;
         }
     }
 

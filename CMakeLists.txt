@@ -24,6 +24,33 @@ add_custom_command(
         VERBATIM
 )
 
+if (NOT TARGET funky-as)
+        ExternalProject_Add(
+                EXT_funky-as
+                GIT_REPOSITORY https://github.com/Funky-System/Funky-Assembler.git
+                GIT_TAG master
+                PREFIX ${CMAKE_CURRENT_BINARY_DIR}/funky-as
+                # Disable install step
+                INSTALL_COMMAND ""
+        )
+        ExternalProject_Get_Property(EXT_funky-as source_dir binary_dir)
+        add_library(funky-as IMPORTED STATIC GLOBAL)
+        add_dependencies(funky-as EXT_funky-as)
+        if (MSVC)
+                set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/funky-as.lib"
+                        "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+        else()
+                if (CMAKE_CONFIGURATION_TYPES)
+                        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/${CMAKE_BUILD_TYPE}/libfunky-as.a"
+                                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+                else()
+                        set_target_properties(funky-as PROPERTIES "IMPORTED_LOCATION" "${binary_dir}/libfunky-as.a"
+                                "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+                endif()
+        endif()
+        include_directories("${source_dir}/include")
+endif()
+
 add_library(wickedc src/libwickedc/mpc/mpc.c
         "${CMAKE_CURRENT_BINARY_DIR}/grammar.gen.c"
         "${CMAKE_CURRENT_BINARY_DIR}/parser.gen.c"
@@ -43,7 +70,7 @@ add_library(wickedc src/libwickedc/mpc/mpc.c
         src/libwickedc/generators/generator_enum.c
         src/libwickedc/string_functions.c)
 add_executable(wickedc-bin src/main.c src/version.h)
-target_link_libraries(wickedc-bin wickedc)
+target_link_libraries(wickedc-bin wickedc funky-as)
 set_target_properties(wickedc-bin PROPERTIES OUTPUT_NAME wickedc)
 
 file(COPY include DESTINATION ${CMAKE_BINARY_DIR})

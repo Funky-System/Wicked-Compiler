@@ -109,6 +109,38 @@ char* compile_string_to_string(const char *filename_hint, const char *input, int
     }
 }
 
+char* compile_file_to_string(const char *filename, int debug) {
+    FILE *fp;
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not open file %s\n", filename);
+        fprintf(stderr, "%s", strerror(errnum));
+        exit(EXIT_FAILURE);
+    }
+
+    fseek(fp, 0L, SEEK_END);
+    size_t numbytes = (size_t)ftell(fp);
+
+    // reset the file position indicator to the beginning of the file
+    fseek(fp, 0L, SEEK_SET);
+
+    char *code_in = malloc(numbytes + 1);
+    if (fread(code_in, sizeof(char), numbytes, fp) != numbytes) {
+        int errnum = errno;
+        fprintf(stderr, "Error: Could not read entire file %s\n", filename);
+        fprintf(stderr, "%s", strerror(errnum));
+        exit(EXIT_FAILURE);
+    }
+    code_in[numbytes] = '\0';
+
+    fclose(fp);
+
+    char* code_out = compile_string_to_string(filename, code_in, debug);
+    free(code_in);
+    return code_out;
+}
+
 int compiler_print_parse_tree(const char *filename, int folded) {
     mpc_err_t *err = generate_parser_grammar();
 
