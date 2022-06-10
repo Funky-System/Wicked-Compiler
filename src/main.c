@@ -120,8 +120,8 @@ int main(int argc, char **argv) {
             free(asm_output);
             return 0;
         } else {
-            char *asm = compile_file_to_string(filename, debug);
-            funky_bytecode_t bc = funky_assemble(filename, asm, !debug);
+            char *asm_code = compile_file_to_string(filename, debug);
+            funky_bytecode_t bc = funky_assemble(filename, asm_code, !debug);
 
             FILE *outFile = fopen(output, "wb");
             if (outFile == NULL) {
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
             fwrite(bc.bytes, sizeof(byte_t), bc.length, outFile);
             fclose(outFile);
             free(bc.bytes);
-            free(asm);
+            free(asm_code);
 
             return 0;
         }
