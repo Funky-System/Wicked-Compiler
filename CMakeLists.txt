@@ -114,3 +114,10 @@ if (TESTING_ENABLED)
 endif()
 
 add_subdirectory(stdlib)
+
+if(COVERAGE)
+        if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+                include(CTestCoverageCollectGCOV)
+                ctest_coverage_collect_gcov(TARBALL gcov.tar)
+        endif()
+endif()
