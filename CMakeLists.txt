@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-if(COVERAGE)
-        message("Coverage enabled")
-        set(CMAKE_C_FLAGS "--coverage")
-        set(CMAKE_CXX_FLAGS "--coverage")
-        set(CMAKE_EXE_LINKER_FLAGS "--coverage")
-endif()
-
 project(wickedc)
 
 set(CMAKE_C_STANDARD 11)
@@ -15,6 +8,22 @@ include(ExternalProject)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default build type: Release" FORCE)
+endif()
+
+message("Compiler identified as ${CMAKE_C_COMPILER_ID}")
+if(COVERAGE)
+        message("Coverage requested")
+        if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+                message("  -> enabled for Clang")
+                set(CMAKE_C_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+                set(CMAKE_CXX_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+                set(CMAKE_EXE_LINKER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+        elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+                message("  -> enabled for GCC")
+                set(CMAKE_C_FLAGS "-fprofile-arcs -ftest-coverage")
+                set(CMAKE_CXX_FLAGS "-fprofile-arcs -ftest-coverage")
+                set(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+        endif()
 endif()
 
 IF(APPLE)
