@@ -1,4 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
+
+if(COVERAGE)
+        message("Coverage enabled")
+        set(CMAKE_C_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+        set(CMAKE_CXX_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+        set(CMAKE_EXE_LINKER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+endif()
+
 project(wickedc)
 
 set(CMAKE_C_STANDARD 11)
@@ -8,6 +16,14 @@ include(ExternalProject)
 if(NOT DEFINED CMAKE_BUILD_TYPE)
         set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default build type: Release" FORCE)
 endif()
+
+IF(APPLE)
+        set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+        set(CMAKE_HAVE_THREADS_LIBRARY 1)
+        set(CMAKE_USE_WIN32_THREADS_INIT 0)
+        set(CMAKE_USE_PTHREADS_INIT 1)
+        set(THREADS_PREFER_PTHREAD_FLAG ON)
+ENDIF()
 
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
