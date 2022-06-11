@@ -51,7 +51,7 @@ jobs:
         run: |
           ctest -C ${{env.BUILD_TYPE}}
           sudo apt install tree
-          tree
+          tree ..
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
