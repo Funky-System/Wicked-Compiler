@@ -51,6 +51,7 @@ jobs:
         run: |
           ctest -C ${{env.BUILD_TYPE}}
           sudo apt install tree
+          find . \( -name "*.cpp" -o -name "*.c" \) -exec sh -c 'gcov {} -o "$(dirname {})"' \;
           tree ..
       - name: Run sonar-scanner
         env:
