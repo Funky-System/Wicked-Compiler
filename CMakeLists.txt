@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 if(COVERAGE)
         message("Coverage enabled")
-        set(CMAKE_C_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
-        set(CMAKE_CXX_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
-        set(CMAKE_EXE_LINKER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+        set(CMAKE_C_FLAGS "--coverage")
+        set(CMAKE_CXX_FLAGS "--coverage")
+        set(CMAKE_EXE_LINKER_FLAGS "--coverage")
 endif()
 
 project(wickedc)
