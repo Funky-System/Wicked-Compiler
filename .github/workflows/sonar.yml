@@ -50,9 +50,8 @@ jobs:
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: |
           ctest -C ${{env.BUILD_TYPE}}
-          sudo apt install tree
-          find . \( -name "*.cpp" -o -name "*.c" \) -exec sh -c 'gcov {} -o "$(dirname {})"' \;
-          tree ..
+          sudo apt install gcovr
+          gcovr -r ./ build/ --sonarqube coverage.xml
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
